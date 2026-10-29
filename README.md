@@ -52,3 +52,7 @@ DBML Studio a été développé en collaboration avec une IA (Claude), qui a éc
 ## Auteur
 
 Cyrille Elie, Business Analyst et ingénieur IA. [cyrille-elie.com](https://cyrille-elie.com)
+
+## Licence
+
+MIT, voir [LICENSE](LICENSE).
