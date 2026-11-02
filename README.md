@@ -55,6 +55,8 @@ npx playwright install chromium
 npm test
 ```
 
+Les tests garantissent l'usage hors ligne : toute requête `http(s)` émise par la page est interceptée, refusée, et fait échouer le test. L'application n'embarque aucune police : elle utilise IBM Plex si elle est installée, sinon les polices système.
+
 ## Comment il a été construit
 
 DBML Studio a été développé en collaboration avec une IA (Claude), qui a écrit le code (parser DBML, interface, outillage de build). De mon côté : la conception fonctionnelle, les choix d'ergonomie, les extensions du langage, et les tests sur des cas réels, qui ont permis de corriger plusieurs bugs de comportement. C'est un exemple de la manière dont je travaille : partir d'un besoin métier, le spécifier, puis piloter la construction avec l'IA jusqu'à un outil utilisable au quotidien.
