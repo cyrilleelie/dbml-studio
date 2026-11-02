@@ -5,17 +5,18 @@ const FLOW_TABLES = ['src_contrats.contrat', 'src_contrats.personne', 'src_sinis
   'dwh.dim_assure', 'dwh.dim_contrat', 'dwh.fait_sinistre', 'mart.indicateur_sp'];
 
 // Fresh page per test; console/page errors are collected and asserted in afterEach.
-let errors;
+let errors, external;
 test.beforeEach(async ({ page, baseURL }) => {
   errors = [];
+  external = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push('console: ' + m.text()); });
-  // Google Fonts is the only network call: stub it so tests are offline-safe
-  await page.route(/^https?:/, r => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+  // the app must work offline: record any http(s) request and make it fail
+  await page.route(/^https?:/, r => { external.push(r.request().url()); return r.abort(); });
   await page.goto(baseURL);
   await expect(page.locator('#status')).toHaveClass(/ok/);
 });
-test.afterEach(() => { expect(errors).toEqual([]); });
+test.afterEach(() => { expect(external, 'no network request expected').toEqual([]); expect(errors).toEqual([]); });
 
 async function loadExample(page, key) {
   await page.click('#btnExamples');
@@ -90,4 +91,6 @@ test('SVG export downloads an SVG with table names', async ({ page }) => {
   const content = require('fs').readFileSync(await download.path(), 'utf8');
   expect(content).toMatch(/^\s*(<\?xml|<svg)/);
   expect(content).toContain('order_items');
+  expect(content).toContain('font:'); // fonts survive the export (var(--sans/--mono) resolved)
+  expect(content).not.toContain('var(--');
 });
