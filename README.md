@@ -45,6 +45,16 @@ Les outils de modélisation du marché sont souvent lourds, en ligne, ou les deu
 2. Menu **Exemples** : « Boutique » pour un modèle relationnel, « Cinématique assurance » pour un flux de données.
 3. Modifier le code : le diagramme suit.
 
+## Tests
+
+Les tests de bout en bout utilisent Playwright (chargement de `index.html` en `file://`, sans serveur) :
+
+```
+npm ci
+npx playwright install chromium
+npm test
+```
+
 ## Comment il a été construit
 
 DBML Studio a été développé en collaboration avec une IA (Claude), qui a écrit le code (parser DBML, interface, outillage de build). De mon côté : la conception fonctionnelle, les choix d'ergonomie, les extensions du langage, et les tests sur des cas réels, qui ont permis de corriger plusieurs bugs de comportement. C'est un exemple de la manière dont je travaille : partir d'un besoin métier, le spécifier, puis piloter la construction avec l'IA jusqu'à un outil utilisable au quotidien.
