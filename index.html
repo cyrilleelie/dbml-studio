@@ -4292,7 +4292,7 @@ function tokenize(src) {
   while (i < n) {
     const c = src[i];
     if (c === '\n') { line++; i++; continue; }
-    if (c === ' ' || c === '\t' || c === '\r') { i++; continue; }
+    if (c === ' ' || c === '\t' || c === '\r' || c === '\uFEFF') { i++; continue; } // \uFEFF : BOM UTF-8
     if (c === '/' && src[i + 1] === '/') { while (i < n && src[i] !== '\n') i++; continue; }
     if (c === '/' && src[i + 1] === '*') {
       const s = line; i += 2;
@@ -4304,7 +4304,7 @@ function tokenize(src) {
       const s = line, st = i; i += 3; let v = '';
       while (i < n && !src.startsWith("'''", i)) { if (src[i] === '\n') line++; v += src[i++]; }
       if (i >= n) throw dbmlErr("Texte ''' non fermé", s);
-      i += 3; toks.push({ t: 'str', v: dedent(v), line: s, s: st, e: i }); continue;
+      i += 3; toks.push({ t: 'str', v: dedent(v.replace(/\r\n/g, '\n')), line: s, s: st, e: i }); continue;
     }
     if (c === '"' || c === "'" || c === '`') {
       const s = line, st = i, q = c; i++; let v = '';
@@ -4423,6 +4423,7 @@ function parseDBML(src) {
 
   const db = { tables: [], refs: [], enums: [], groups: [], mappings: [], refGroups: [], lanes: [], lanesBlocks: [] };
   let currentRefGroup = null;
+  const partials = new Map(); // TablePartial nommés, injectés par « ~nom » dans les tables
 
   const relSettings = (ref, list) => {
     for (const s of list) {
@@ -4504,10 +4505,12 @@ function parseDBML(src) {
     if (t.t !== 'id') throw dbmlErr(`Déclaration inattendue « ${t.v} » — attendu Table, Ref, Enum…`, t.line);
     const kw = t.v.toLowerCase();
 
-    if (kw === 'table') {
+    if (kw === 'table' || kw === 'tablepartial') {
       next();
+      const isPartial = kw === 'tablepartial';
+      const refsBefore = db.refs.length;
       const parts = dotted();
-      const tbl = { name: parts.join('.'), alias: null, cols: [], note: null, color: null, lane: null, laneIndex: -1, line: t.line };
+      const tbl = { name: parts.join('.'), alias: null, cols: [], note: null, color: null, lane: null, laneIndex: -1, line: t.line, injects: [] };
       if (isKw(peek(), 'as')) { next(); tbl.alias = name(); }
       if (isSym(peek(), '[')) {
         const list = settings(), range = lastRange;
@@ -4545,10 +4548,20 @@ function parseDBML(src) {
           next(); continue;
         }
         if (isKw(c, 'note') && (isSym(peek(1), ':') || isSym(peek(1), '{'))) { next(); tbl.note = noteValue(); continue; }
+        if (isSym(c, '~')) { next(); tbl.injects.push({ name: dotted().join('.'), at: tbl.cols.length, line: c.line }); continue; } // ~partial
         const ct = next();
         if (ct.t !== 'id' && ct.t !== 'qid') throw dbmlErr(`Nom de colonne attendu, trouvé « ${ct.v} »`, ct.line);
         const ln = ct.line; const typeToks = [];
-        while (peek().line === ln && !isSym(peek(), '[') && !isSym(peek(), '}') && peek().t !== 'eof') typeToks.push(next());
+        while (peek().line === ln && !isSym(peek(), '}') && peek().t !== 'eof') {
+          // « [ ] » et « [ 3 ] » après le type sont des tableaux (int[], varchar(10)[]), pas des paramètres
+          if (isSym(peek(), '[')) {
+            const a1 = peek(1), a2 = peek(2);
+            if (isSym(a1, ']')) { typeToks.push(next(), next()); continue; }
+            if (a1.t === 'id' && /^\d+$/.test(a1.v) && isSym(a2, ']')) { typeToks.push(next(), next(), next()); continue; }
+            break;
+          }
+          typeToks.push(next());
+        }
         if (!typeToks.length) throw dbmlErr(`Colonne « ${ct.v} » : type manquant`, ln);
         const col = {
           name: ct.v, type: (typeToks.length === 1 && typeToks[0].t === 'qid') ? typeToks[0].v : raw(typeToks),
@@ -4558,7 +4571,11 @@ function parseDBML(src) {
         tbl.cols.push(col);
         if (isSym(peek(), '[') && peek().line === ln) for (const s of settings()) applyCol(col, s, tbl);
       }
-      db.tables.push(tbl);
+      if (isPartial) {
+        db.refs.length = refsBefore; // refs en ligne d'un partial : ignorées (la table cible n'existe pas)
+        if (partials.has(tbl.name)) throw dbmlErr(`TablePartial « ${tbl.name} » déclaré deux fois`, t.line);
+        partials.set(tbl.name, tbl);
+      } else db.tables.push(tbl);
     }
 
     else if (kw === 'ref') {
@@ -4668,7 +4685,7 @@ function parseDBML(src) {
       db.mappings.push(mp);
     }
 
-    else if (kw === 'project' || kw === 'tablepartial' || kw === 'records') {
+    else if (kw === 'project' || kw === 'records') {
       next();
       while (!isSym(peek(), '{')) { if (peek().t === 'eof') throw dbmlErr(`${t.v} : bloc { attendu`, t.line); next(); }
       skipBlock();
@@ -4682,6 +4699,26 @@ function parseDBML(src) {
 
     else throw dbmlErr(`Mot-clé inconnu « ${t.v} » — attendu Table, Ref, Enum, TableGroup, Mapping, Lanes, Project ou Note`, t.line);
   }
+
+  // ---- Injection des TablePartial (~nom) : les colonnes propres à la table l'emportent ----
+  const expanded = new Set();
+  const expand = tb => {
+    if (expanded.has(tb)) return;
+    expanded.add(tb);
+    if (!tb.injects.length) return;
+    const own = tb.cols, out = []; const names = new Set(own.map(c => c.name));
+    const addAt = pos => tb.injects.filter(x => x.at === pos).forEach(inj => {
+      const pt = partials.get(inj.name);
+      if (!pt) throw dbmlErr(`TablePartial « ${inj.name} » introuvable`, inj.line);
+      if (pt === tb) throw dbmlErr(`TablePartial « ${inj.name} » s'injecte lui-même`, inj.line);
+      expand(pt);
+      for (const c of pt.cols) if (!names.has(c.name)) { names.add(c.name); out.push({ ...c }); }
+    });
+    own.forEach((c, i) => { addAt(i); out.push(c); });
+    addAt(own.length);
+    tb.cols = out;
+  };
+  db.tables.forEach(expand);
 
   // ---- Validation / résolution ----
   const byName = new Map();
