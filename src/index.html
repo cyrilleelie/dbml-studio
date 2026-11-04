@@ -46,8 +46,8 @@ button{font:inherit;color:inherit}
 .bar{display:flex;align-items:center;gap:14px;padding:8px 12px;background:var(--bar);border-bottom:1px solid var(--bar-line);flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;letter-spacing:-.01em;color:var(--ink)}
 .brand svg{flex:none}
-.stats{color:var(--muted);font-size:13px;flex:1;min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
+.stats{color:var(--muted);font-size:13px;flex:1 1 0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.actions{display:flex;gap:2px;flex-wrap:wrap}
 .btn{border:1px solid var(--bar-line);background:var(--btn);border-radius:6px;padding:5px 11px;font-size:13px;cursor:pointer;line-height:1.3;white-space:nowrap}
 .btn:hover{background:var(--btn-hover)}
 .btn.warn{border-color:var(--danger);color:var(--danger)}
@@ -56,7 +56,7 @@ button{font:inherit;color:inherit}
 .ed-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px 5px 14px;border-bottom:1px solid var(--code-line);background:var(--code-bg)}
 .ed-title{font:600 12px var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--code-gutter)}
 .ed-head .btn{padding:3px 8px;font-size:12px}
-.editor-pane{flex:0 0 38%;min-width:240px;display:flex;flex-direction:column;background:var(--code-bg);min-height:0;position:relative}
+.editor-pane{flex:0 0 38%;min-width:240px;max-width:calc(100% - 246px);display:flex;flex-direction:column;background:var(--code-bg);min-height:0;position:relative}
 .findbar{position:absolute;z-index:6;top:42px;left:6px;right:6px;display:flex;align-items:center;gap:5px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;padding:5px 6px;box-shadow:var(--shadow);flex-wrap:wrap}
 .findbar[hidden]{display:none}
 .findbar input{background:var(--btn);color:var(--ink);border:1px solid var(--bar-line);border-radius:5px;padding:4px 7px;font:12.5px var(--mono);width:120px;min-width:0}
@@ -65,7 +65,6 @@ button{font:inherit;color:inherit}
 .fb-icon{border:1px solid transparent;background:none;color:var(--ink-2);border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:12.5px;line-height:1}
 .fb-icon:hover{background:var(--btn-hover)}
 .fb-icon[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-#btnConcept[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .fb-count{font-size:11.5px;color:var(--muted);min-width:38px;text-align:center}
 .fb-count.none{color:var(--danger)}
 .find-hl{position:absolute;background:var(--signal-soft);outline:1.5px solid var(--signal);border-radius:2px;pointer-events:none}
@@ -104,7 +103,8 @@ button{font:inherit;color:inherit}
 .split.editor-collapsed .canvas-pane{flex:1}
 .reopen-editor{position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:5;background:var(--bar);border:1px solid var(--bar-line);border-left:0;border-radius:0 8px 8px 0;padding:10px 6px;cursor:pointer;box-shadow:var(--shadow);color:var(--ink-2);writing-mode:vertical-rl}
 .reopen-editor[hidden]{display:none}
-.splitter:hover,.splitter.active{background:var(--signal)}
+.splitter:hover,.splitter.active,.splitter:focus-visible{background:var(--signal)}
+.splitter:focus-visible{outline:none}
 
 .canvas-pane{flex:1;position:relative;min-width:0;overflow:hidden;
   background-color:var(--paper);
@@ -112,14 +112,15 @@ button{font:inherit;color:inherit}
   background-size:24px 24px}
 #svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 #svg.panning{cursor:grabbing}
-.toolbar{position:absolute;right:12px;bottom:12px;display:flex;gap:4px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;padding:4px;box-shadow:var(--shadow)}
+.toolbar{position:absolute;right:12px;bottom:12px;max-width:calc(100% - 24px);display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;padding:4px;box-shadow:var(--shadow)}
 .toolbar .btn{border-color:transparent;background:transparent;padding:4px 9px}
 .toolbar .btn:hover{background:var(--btn-hover)}
+.toolbar .btn[aria-pressed=true],.toolbar .btn[aria-expanded=true]{background:var(--btn-hover);border-color:var(--signal);color:var(--ink)}
+.toolbar .btn:disabled{opacity:.45;cursor:default}
+.tgroup{display:flex;gap:2px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .zoom{min-width:48px;text-align:center;font-size:12.5px;color:var(--muted);align-self:center;font-variant-numeric:tabular-nums}
 .sep{width:1px;background:var(--bar-line);margin:3px 2px}
-.help-btn{position:absolute;left:12px;top:12px;width:30px;height:30px;padding:0;border-radius:50%;font-weight:600;background:var(--bar);box-shadow:var(--shadow)}
-.help-pop{left:12px;top:50px;max-width:min(300px,calc(100% - 24px));padding:10px 12px;line-height:1.5;color:var(--ink-2)}
-.help-pop[hidden]{display:none}
+@media (max-width:1100px){.toolbar .sep{display:none}}
 .empty[hidden]{display:none}
 .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;pointer-events:none;text-align:center;padding:24px}
 
@@ -197,7 +198,7 @@ button{font:inherit;color:inherit}
 @keyframes flowdash{to{stroke-dashoffset:-12}}
 .node .hotrow.start{fill:var(--signal);opacity:.35}
 .overlay{position:absolute;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;box-shadow:var(--shadow);font-size:12.5px}
-.sidepanel{right:12px;bottom:56px;padding:6px;min-width:230px;max-width:min(300px,calc(100% - 24px));max-height:min(420px,calc(100% - 80px));display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
+.sidepanel{right:12px;top:56px;padding:6px;min-width:230px;max-width:min(300px,calc(100% - 24px));max-height:min(420px,calc(100% - 130px));display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
 .sidepanel .fp-body{overflow-y:auto;min-height:0}
 .fp-title{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:4px 6px;font-weight:600;cursor:pointer;font-size:12.5px}
 .fp-title::after{content:"▾";color:var(--muted);font-size:11px}
@@ -219,11 +220,20 @@ button{font:inherit;color:inherit}
 .trace span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .trace b{font-weight:600}
 .menu-wrap{position:relative}
-.menu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;width:280px;padding:6px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;box-shadow:var(--shadow)}
+.menu{position:absolute;left:0;top:calc(100% + 4px);z-index:5;width:280px;padding:6px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;box-shadow:var(--shadow)}
 .menu[hidden]{display:none}
 .mi{display:block;width:100%;text-align:left;border:0;background:none;padding:7px 9px;border-radius:6px;cursor:pointer}
 .mi small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
-.mi:hover{background:var(--btn-hover)}
+.mi{color:inherit;text-decoration:none}
+.mi:hover,.mi:focus-visible{background:var(--btn-hover)}
+.mi:disabled{opacity:.45;cursor:default}
+.mi:disabled:hover{background:none}
+.mi[hidden]{display:none !important}
+.mi[aria-checked]{padding-left:24px;position:relative}
+.mi[aria-checked="true"]::before{content:"✓";position:absolute;left:8px;top:7px}
+.mtitle{padding:5px 9px 2px;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.btn.mb{border-color:transparent;background:transparent;padding:5px 9px}
+.btn.mb:hover,.btn.mb[aria-expanded="true"]{background:var(--btn-hover)}
 .mi small{display:block;color:var(--muted);font-size:12px}
 .confirm{padding:8px 9px;border-top:1px solid var(--bar-line);margin-top:4px;font-size:13px}
 .confirm[hidden]{display:none}
@@ -308,6 +318,15 @@ button{font:inherit;color:inherit}
 .del-list .k{color:var(--muted);font-size:11.5px}
 .del-warn{color:var(--danger);font-size:12.5px;margin:0}
 
+/* Aide */
+.sheet.narrow{width:min(560px,100%)}
+.helpbody{padding:4px 16px 14px;overflow-y:auto;font-size:13px}
+.helpbody h3{margin:12px 0 4px;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.helpbody dl{display:grid;grid-template-columns:max-content 1fr;gap:5px 16px;margin:0}
+.helpbody dt{color:var(--ink-2);font-weight:500}
+.helpbody dd{margin:0;color:var(--ink-2)}
+.helpbody kbd{font:11.5px var(--sans);color:var(--muted)}
+
 /* Modale SQL */
 .modal{position:fixed;inset:0;background:rgba(10,20,30,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
 .modal[hidden]{display:none}
@@ -318,7 +337,7 @@ button{font:inherit;color:inherit}
 
 @media (max-width:760px){
   .split{flex-direction:column}
-  .editor-pane{flex:0 0 42% !important;min-width:0}
+  .editor-pane{flex:0 0 42% !important;min-width:0;max-width:none}
   .splitter{display:none}
   .stats{order:3;flex-basis:100%}
 }
@@ -332,45 +351,55 @@ button{font:inherit;color:inherit}
       <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><rect x="1.5" y="3" width="8" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="12.5" y="12" width="8" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 6.5h3.5v9h-0.5" fill="none" stroke="#e39a2d" stroke-width="1.6"/></svg>
       DBML Studio
     </div>
-    <div class="doc" id="docName"><span>Sans titre</span></div>
-    <button class="typebadge" id="typeBadge" title="Changer le type de schéma"></button>
-    <div class="stats" id="stats"></div>
-    <div class="actions">
+    <nav class="actions" id="menubar" role="menubar" aria-label="Menus">
       <div class="menu-wrap">
-        <button class="btn" id="btnFile" data-menu="fileMenu" aria-haspopup="true" aria-expanded="false">Fichier ▾</button>
-        <div class="menu" id="fileMenu" hidden>
-          <button class="mi" id="btnNewFlow">Nouveau schéma de cinématique<small>Flux de données, colonnes (Lanes)</small></button>
-          <button class="mi" id="btnNewModel">Nouveau modèle objets relations<small>Relations, cardinalités, domaine fonctionnel</small></button>
-          <div class="msep"></div>
-          <button class="mi row" id="btnOpen">Ouvrir…<kbd data-kbd="O"></kbd></button>
-          <button class="mi row" id="btnSave">Enregistrer<kbd data-kbd="S"></kbd></button>
-          <button class="mi row" id="btnSaveAs">Enregistrer sous…<kbd data-kbd="⇧S"></kbd></button>
-          <div class="msep"></div>
-          <button class="mi row" id="btnFind">Rechercher / remplacer…<kbd data-kbd="F"></kbd></button>
-          <div class="msep"></div>
-          <button class="mi" id="btnCopy">Copier le DBML</button>
-          <button class="mi" id="copyStd" title="Retire les blocs Mapping pour rester compatible avec dbdiagram.io et @dbml/core">Copier en DBML standard<small>Sans les extensions DBML Studio (Mapping, Lanes, lane, domain)</small></button>
-        </div>
-      </div>
-      <input type="file" id="file" accept=".dbml,.txt,text/plain" hidden>
-      <div class="menu-wrap">
-        <button class="btn" id="btnExport" data-menu="exportMenu" aria-haspopup="true" aria-expanded="false">Exporter ▾</button>
-        <div class="menu" id="exportMenu" hidden>
-          <button class="mi" id="btnImage">Image du schéma…<small>PNG, JPG, WebP ou SVG</small></button>
-          <button class="mi" id="btnSql">Script SQL PostgreSQL…<small>Tables, types, clés étrangères, commentaires</small></button>
-        </div>
-      </div>
-      <div class="menu-wrap">
-        <button class="btn" id="btnExamples" data-menu="exMenu" aria-haspopup="true" aria-expanded="false">Exemples ▾</button>
-        <div class="menu" id="exMenu" hidden>
-          <button class="mi" data-ex="shop">Boutique en ligne<small>Modèle objets relations : relations, régions, domaine</small></button>
-          <button class="mi" data-ex="flow">Cinématique assurance<small>Cinématique de données : source → staging → entrepôt → indicateur</small></button>
+        <button class="btn mb" id="btnFile" data-menu="fileMenu" role="menuitem" aria-haspopup="true" aria-expanded="false">Fichier</button>
+        <div class="menu" id="fileMenu" role="menu" aria-label="Fichier" hidden>
+          <button class="mi" role="menuitem" id="btnNewFlow">Nouveau schéma de cinématique<small>Flux de données, colonnes (Lanes)</small></button>
+          <button class="mi" role="menuitem" id="btnNewModel">Nouveau modèle objets relations<small>Relations, cardinalités, domaine fonctionnel</small></button>
+          <div class="msep" role="separator"></div>
+          <button class="mi row" role="menuitem" id="btnOpen">Ouvrir…<kbd data-kbd="O"></kbd></button>
+          <button class="mi row" role="menuitem" id="btnSave">Enregistrer<kbd data-kbd="S"></kbd></button>
+          <button class="mi row" role="menuitem" id="btnSaveAs">Enregistrer sous…<kbd data-kbd="⇧S"></kbd></button>
+          <div class="msep" role="separator"></div>
+          <div class="mtitle">Exemples</div>
+          <button class="mi" role="menuitem" data-ex="shop">Boutique en ligne<small>Modèle objets relations : relations, régions, domaine</small></button>
+          <button class="mi" role="menuitem" data-ex="flow">Cinématique assurance<small>Cinématique de données : source → staging → entrepôt → indicateur</small></button>
           <div class="confirm" id="exConfirm" hidden>Remplacer ton code actuel ?
             <div><button class="btn warn" id="exOk">Remplacer</button><button class="btn" id="exCancel">Annuler</button></div>
           </div>
         </div>
       </div>
-    </div>
+      <input type="file" id="file" accept=".dbml,.txt,text/plain" hidden>
+      <div class="menu-wrap">
+        <button class="btn mb" id="btnEdit" data-menu="editMenu" role="menuitem" aria-haspopup="true" aria-expanded="false">Édition</button>
+        <div class="menu" id="editMenu" role="menu" aria-label="Édition" hidden>
+          <button class="mi row" role="menuitem" id="btnFind">Rechercher / remplacer…<kbd data-kbd="F"></kbd></button>
+          <button class="mi" role="menuitem" id="btnCopy">Copier le DBML</button>
+          <button class="mi" role="menuitem" id="copyStd" title="Retire les blocs Mapping pour rester compatible avec dbdiagram.io et @dbml/core">Copier en DBML standard<small>Sans les extensions DBML Studio (Mapping, Lanes, lane, domain)</small></button>
+          <div class="msep" role="separator"></div>
+          <button class="mi row" role="menuitem" id="btnDelete">Supprimer la sélection<kbd>Suppr</kbd></button>
+          <button class="mi" role="menuitem" id="btnType">Changer le type de schéma…</button>
+        </div>
+      </div>
+      <div class="menu-wrap">
+        <button class="btn mb" id="btnExport" data-menu="exportMenu" role="menuitem" aria-haspopup="true" aria-expanded="false">Exporter</button>
+        <div class="menu" id="exportMenu" role="menu" aria-label="Exporter" hidden>
+          <button class="mi" role="menuitem" id="btnImage">Image du schéma…<small>PNG, JPG, WebP ou SVG</small></button>
+          <button class="mi" role="menuitem" id="btnSql">Script SQL PostgreSQL…<small>Tables, types, clés étrangères, commentaires</small></button>
+        </div>
+      </div>
+      <div class="menu-wrap">
+        <button class="btn mb" id="btnAide" data-menu="helpMenu" role="menuitem" aria-haspopup="true" aria-expanded="false">Aide</button>
+        <div class="menu" id="helpMenu" role="menu" aria-label="Aide" hidden>
+          <button class="mi" role="menuitem" id="btnShortcuts">Raccourcis et gestes…</button>
+          <a class="mi" role="menuitem" id="lnkSyntax" href="https://dbml.dbdiagram.io/docs/" target="_blank" rel="noopener">Syntaxe DBML ↗</a>
+        </div>
+      </div>
+    </nav>
+    <div class="doc" id="docName"><span>Sans titre</span></div>
+    <button class="typebadge" id="typeBadge" title="Changer le type de schéma"></button>
+    <div class="stats" id="stats"></div>
   </header>
   <main class="split">
     <section class="editor-pane" id="editorPane" aria-label="Éditeur DBML">
@@ -398,14 +427,12 @@ button{font:inherit;color:inherit}
       </div>
       <div class="status" id="status" role="status"></div>
     </section>
-    <div class="splitter" id="splitter" role="separator" aria-orientation="vertical" title="Redimensionner"></div>
+    <div class="splitter" id="splitter" role="separator" aria-orientation="vertical" aria-label="Largeur de l’éditeur" aria-valuemin="240" tabindex="0" title="Glisser pour redimensionner · flèches ← → · double-clic : largeur par défaut"></div>
     <section class="canvas-pane" id="canvasPane" aria-label="Diagramme">
       <svg id="svg" xmlns="http://www.w3.org/2000/svg">
         <g id="world"><g id="lanesLayer"></g><g id="groupsLayer"></g><g id="edgesLayer"></g><g id="nodesLayer"></g></g>
       </svg>
       <div class="empty" id="empty" hidden>Écris une première table à gauche, par exemple :<br><br>Table users {<br>&nbsp;&nbsp;id integer [pk]<br>}</div>
-      <button class="btn help-btn" id="btnHelp" aria-haspopup="true" aria-expanded="false" aria-controls="helpPop" title="Aide : manipuler le diagramme" aria-label="Aide">?</button>
-      <div class="overlay help-pop" id="helpPop" role="note" hidden>Glisse les tables ou les régions · Maj+glisser pour sélectionner plusieurs éléments · double-clic pour aller au code · survole une table pour mettre ses relations en évidence</div>
       <div class="marquee" id="marquee" hidden></div>
       <div class="overlay sidepanel" id="displayPanel" hidden></div>
       <div class="overlay sidepanel" id="lockPanel" hidden></div>
@@ -417,21 +444,57 @@ button{font:inherit;color:inherit}
       </div>
       <div class="overlay trace" id="traceChip" hidden><span id="traceText"></span><button class="btn" id="traceClear">Effacer</button></div>
       <button class="reopen-editor" id="btnReopenEditor" hidden title="Afficher l’éditeur (Ctrl/⌘ B)">Éditeur</button>
-      <div class="toolbar">
-        <button class="btn" id="zOut" aria-label="Dézoomer">−</button>
-        <span class="zoom" id="zPct">100%</span>
-        <button class="btn" id="zIn" aria-label="Zoomer">+</button>
+      <div class="toolbar" role="toolbar" aria-label="Zoom, affichage et disposition">
+        <div class="tgroup" role="group" aria-label="Zoom">
+          <button class="btn" id="zOut" aria-label="Dézoomer" title="Dézoomer">−</button>
+          <span class="zoom" id="zPct">100%</span>
+          <button class="btn" id="zIn" aria-label="Zoomer" title="Zoomer">+</button>
+        </div>
         <span class="sep"></span>
-        <button class="btn" id="btnFit">Tout afficher</button>
-        <button class="btn" id="btnCollapseAll">Tout replier</button>
-        <button class="btn" id="btnLayout">Réorganiser</button>
-        <button class="btn" id="btnConcept" aria-pressed="false" title="Tables et relations avec cardinalités, sans attributs ni flux">Vue conceptuelle</button>
+        <div class="tgroup" role="group" aria-label="Affichage">
+          <button class="btn" id="btnConcept" aria-pressed="false" aria-label="Vue conceptuelle" title="Vue conceptuelle : tables et relations avec cardinalités, sans attributs ni flux">Vue conceptuelle</button>
+          <button class="btn" id="btnDisplayPanel" aria-haspopup="true" aria-expanded="false" aria-label="Éléments affichés" title="Éléments affichés : choisir ce qui est visible">Éléments affichés</button>
+          <button class="btn" id="btnFit" aria-label="Tout afficher" title="Tout afficher : ajuster le zoom au schéma">Tout afficher</button>
+          <button class="btn" id="btnToggleEditor" aria-pressed="true" aria-label="Éditeur" title="Masquer l’éditeur (Ctrl/⌘ B)">Éditeur</button>
+        </div>
         <span class="sep"></span>
-        <button class="btn" id="btnLockPanel" aria-haspopup="true" aria-expanded="false">Verrouiller</button>
-        <button class="btn" id="btnDisplayPanel" aria-haspopup="true" aria-expanded="false">Affichage</button>
+        <div class="tgroup" role="group" aria-label="Disposition">
+          <button class="btn" id="btnLayout" aria-label="Réorganiser" title="Réorganiser : recalcule la disposition automatique">Réorganiser</button>
+          <button class="btn" id="btnCollapseAll" aria-label="Tout replier" title="Tout replier ou déplier les tables">Tout replier</button>
+          <button class="btn" id="btnLockPanel" aria-haspopup="true" aria-expanded="false" aria-label="Verrouiller les positions" title="Verrouiller les positions : choisir les éléments à figer">Verrouiller</button>
+        </div>
       </div>
     </section>
   </main>
+</div>
+
+<div class="modal" id="helpModal" hidden>
+  <div class="sheet narrow" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <header><h2 id="helpTitle">Raccourcis et gestes</h2><button class="btn" id="helpClose">Fermer</button></header>
+    <div class="helpbody">
+      <h3>Clavier</h3>
+      <dl>
+        <dt><kbd data-kbd="S"></kbd></dt><dd>Enregistrer (avec Maj : enregistrer sous)</dd>
+        <dt><kbd data-kbd="O"></kbd></dt><dd>Ouvrir un fichier</dd>
+        <dt><kbd data-kbd="F"></kbd></dt><dd>Rechercher / remplacer dans le code</dd>
+        <dt><kbd data-kbd="B"></kbd></dt><dd>Masquer ou afficher l’éditeur</dd>
+        <dt><kbd data-kbd="Espace"></kbd></dt><dd>Suggestions dans l’éditeur</dd>
+        <dt><kbd>Suppr</kbd></dt><dd>Supprimer la sélection</dd>
+        <dt><kbd>← ↑ → ↓</kbd></dt><dd>Déplacer la vue (Maj : plus vite)</dd>
+        <dt><kbd>Échap</kbd></dt><dd>Fermer un menu ou une fenêtre, effacer la sélection</dd>
+      </dl>
+      <h3>Diagramme</h3>
+      <dl>
+        <dt>Glisser</dt><dd>Déplacer une table ou une région, ou la vue sur le fond</dd>
+        <dt>Maj + glisser</dt><dd>Sélectionner plusieurs éléments</dd>
+        <dt>Double-clic</dt><dd>Aller au code de l’élément</dd>
+        <dt>Survol</dt><dd>Mettre en évidence les relations d’une table</dd>
+        <dt>Molette</dt><dd>Zoomer</dd>
+        <dt>Maj + molette</dt><dd>Défiler horizontalement</dd>
+        <dt>Alt + molette</dt><dd>Défiler verticalement</dd>
+      </dl>
+    </div>
+  </div>
 </div>
 
 <div class="modal" id="modal" hidden>
@@ -1718,10 +1781,6 @@ svg.addEventListener('pointerover', e => {
   setHover(g ? g.dataset.id : null);
 });
 svg.addEventListener('pointerleave', () => setHover(null));
-$('btnHelp').onclick = () => { const h = $('helpPop').hidden; $('helpPop').hidden = !h; $('btnHelp').setAttribute('aria-expanded', String(h)); };
-document.addEventListener('click', e => {
-  if (!$('helpPop').hidden && !e.target.closest('#helpPop, #btnHelp')) { $('helpPop').hidden = true; $('btnHelp').setAttribute('aria-expanded', 'false'); }
-});
 function lanesSVG() {
   if (!showLanes || !laneGeo.length || !nodes.length) return '';
   const PAD = 70;
@@ -1743,7 +1802,9 @@ function renderAll() {
   renderTraceChip();
   renderGroups(); renderEdges(); renderNodes();
   const all = nodes.length > 0 && nodes.every(n => collapsed.has(n.id));
-  $('btnCollapseAll').textContent = all ? 'Tout déplier' : 'Tout replier';
+  const ca = $('btnCollapseAll');
+  ca.textContent = all ? 'Tout déplier' : 'Tout replier';
+  ca.setAttribute('aria-label', ca.textContent);
 }
 // ---------- Ajustement automatique de la disposition ----------
 // Quand un élément change de hauteur (table, enum ou région repliée / dépliée), ce qui se trouve
@@ -2168,7 +2229,7 @@ function setConceptual(on) {
   syncConceptUI();
 }
 function syncConceptUI() {
-  const b = $('btnConcept'); b.setAttribute('aria-pressed', String(conceptual)); b.classList.toggle('on', conceptual);
+  $('btnConcept').setAttribute('aria-pressed', String(conceptual));
   $('btnCollapseAll').disabled = conceptual;
 }
 $('btnConcept').onclick = () => setConceptual(!conceptual);
@@ -2178,7 +2239,7 @@ syncConceptUI();
 function syncTypeUI() {
   document.body.dataset.type = schemaType;
   $('typeBadge').textContent = TYPE_LABEL[schemaType];
-  $('btnConcept').style.display = schemaType === 'flow' ? 'none' : '';
+  $('btnConcept').hidden = schemaType === 'flow';
   syncConceptUI();
   if (!$('displayPanel').hidden) renderDisplayPanel();
 }
@@ -2223,6 +2284,7 @@ function chooseType(title, body, current, cb) {
     { label: 'Annuler', cb: null }
   ]);
 }
+$('btnType').onclick = () => $('typeBadge').click();
 $('typeBadge').onclick = () => chooseType('Type de schéma', 'Changer le type recalcule la disposition. Cinématique : flux de données seuls, en colonnes. Modèle : relations seules, avec cardinalités et domaine.', schemaType, t => { if (t !== schemaType) setSchemaType(t, true); });
 const NEW_FLOW = `// Schéma de cinématique de données : les flux (Mapping) relient des colonnes d'une table à celles d'une autre.
 // Les colonnes verticales (Lanes) rangent les tables par système ou par étape, de gauche à droite.
@@ -2735,11 +2797,13 @@ document.addEventListener('keydown', e => {
   const tag = (document.activeElement && document.activeElement.tagName) || '';
   if (tag === 'INPUT') return;
   if (tag === 'TEXTAREA' && !programmaticFocus) return;
-  const ids = multiSel.size ? [...multiSel] : (selected ? [selected] : []);
+  const ids = selectionIds();
   if (!ids.length) return;
   e.preventDefault();
   openDeleteConfirm(ids);
 });
+const selectionIds = () => multiSel.size ? [...multiSel] : (selected ? [selected] : []);
+$('btnDelete').onclick = () => { const ids = selectionIds(); if (ids.length) openDeleteConfirm(ids); };
 
 // ---------- Repli de l'éditeur ----------
 const LS_EDCOL = 'dbml-studio:editor-collapsed';
@@ -2747,11 +2811,15 @@ const splitEl = document.querySelector('.split');
 function setEditorCollapsed(v) {
   splitEl.classList.toggle('editor-collapsed', v);
   $('btnReopenEditor').hidden = !v;
+  const te = $('btnToggleEditor');
+  te.title = (v ? 'Afficher l’éditeur' : 'Masquer l’éditeur') + ' (Ctrl/⌘ B)';
+  te.setAttribute('aria-pressed', String(!v));
   store.set(LS_EDCOL, v ? '1' : '');
   requestAnimationFrame(fit);
 }
 $('btnCollapseEditor').onclick = () => setEditorCollapsed(true);
 $('btnReopenEditor').onclick = () => setEditorCollapsed(false);
+$('btnToggleEditor').onclick = () => setEditorCollapsed(!splitEl.classList.contains('editor-collapsed'));
 if (store.get(LS_EDCOL)) setEditorCollapsed(true);
 document.addEventListener('keydown', e => {
   const mod = e.ctrlKey || e.metaKey, k = (e.key || '').toLowerCase();
@@ -2761,15 +2829,30 @@ document.addEventListener('keydown', e => {
 // ---------- Séparateur redimensionnable ----------
 (() => {
   const sp = $('splitter'), ed = $('editorPane');
+  const LS_EDW = 'dbml-studio:editor-width', MIN = 240, STEP = 24;
+  const maxW = () => Math.max(MIN, splitEl.clientWidth - sp.offsetWidth - MIN); // le canevas garde 240 px au moins
+  const syncAria = () => { if (ed.offsetWidth) sp.setAttribute('aria-valuenow', String(Math.round(ed.offsetWidth))); };
+  function setW(w, persist) {
+    w = clamp(Math.round(w), MIN, maxW());
+    ed.style.flexBasis = w + 'px'; syncAria();
+    if (persist) store.set(LS_EDW, String(w));
+  }
+  const refit = () => requestAnimationFrame(fit);
+  const saved = parseInt(store.get(LS_EDW), 10);
+  if (saved > 0) setW(saved, false);
+  syncAria();
   let active = false;
   sp.addEventListener('pointerdown', e => { active = true; sp.setPointerCapture(e.pointerId); sp.classList.add('active'); });
-  sp.addEventListener('pointermove', e => {
-    if (!active) return;
-    const w = clamp(e.clientX, 240, window.innerWidth - 240);
-    ed.style.flexBasis = w + 'px';
-  });
-  const stop = () => { active = false; sp.classList.remove('active'); };
+  sp.addEventListener('pointermove', e => { if (active) setW(e.clientX - splitEl.getBoundingClientRect().left, false); });
+  const stop = () => { if (!active) return; active = false; sp.classList.remove('active'); setW(ed.offsetWidth, true); refit(); };
   sp.addEventListener('pointerup', stop); sp.addEventListener('pointercancel', stop);
+  sp.addEventListener('keydown', e => {
+    const d = e.key === 'ArrowLeft' ? -STEP : e.key === 'ArrowRight' ? STEP : 0;
+    if (!d) return;
+    e.preventDefault(); setW(ed.offsetWidth + d, true); refit();
+  });
+  sp.addEventListener('dblclick', () => { ed.style.flexBasis = ''; store.set(LS_EDW, ''); syncAria(); refit(); });
+  window.addEventListener('resize', () => { if (ed.style.flexBasis && ed.offsetWidth) setW(parseInt(ed.style.flexBasis, 10), false); else syncAria(); });
 })();
 
 // ---------- Parsing à la frappe ----------
@@ -2990,23 +3073,63 @@ window.addEventListener('beforeunload', e => { if (fileHandle && isDirty()) { e.
 // ---------- Menus ----------
 const menuBtns = [...document.querySelectorAll('[data-menu]')];
 let pendingEx = null;
+const menuItems = m => [...m.querySelectorAll('.mi')].filter(i => !i.hidden && !i.disabled);
 function closeMenus() {
   menuBtns.forEach(b => { $(b.dataset.menu).hidden = true; b.setAttribute('aria-expanded', 'false'); });
   $('exConfirm').hidden = true; pendingEx = null;
 }
 const closeMenu = closeMenus;
-menuBtns.forEach(b => b.addEventListener('click', e => {
-  e.stopPropagation();
-  const m = $(b.dataset.menu), open = m.hidden;
-  closeMenus();
-  if (open) { m.hidden = false; b.setAttribute('aria-expanded', 'true'); }
-}));
-document.querySelectorAll('.menu').forEach(m => m.addEventListener('click', e => e.stopPropagation()));
+const openMenuBtn = () => menuBtns.find(b => !$(b.dataset.menu).hidden);
+function refreshMenuState() { $('btnDelete').disabled = !selectionIds().length; }
+function openMenu(b) {
+  closeMenus(); refreshMenuState();
+  $(b.dataset.menu).hidden = false; b.setAttribute('aria-expanded', 'true');
+}
+menuBtns.forEach(b => {
+  b.addEventListener('click', e => {
+    e.stopPropagation();
+    if ($(b.dataset.menu).hidden) openMenu(b); else closeMenus();
+  });
+  // barre de menus : quand un menu est ouvert, survoler un autre le fait basculer
+  b.addEventListener('mouseenter', () => { const o = openMenuBtn(); if (o && o !== b) openMenu(b); });
+  b.addEventListener('keydown', e => {
+    const i = menuBtns.indexOf(b), o = openMenuBtn();
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const n = menuBtns[(i + (e.key === 'ArrowRight' ? 1 : menuBtns.length - 1)) % menuBtns.length];
+      n.focus(); if (o) openMenu(n);
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if ($(b.dataset.menu).hidden) openMenu(b);
+      const it = menuItems($(b.dataset.menu)); (e.key === 'ArrowDown' ? it[0] : it[it.length - 1]).focus();
+    }
+  });
+});
+document.querySelectorAll('.menu').forEach(m => {
+  m.addEventListener('click', e => {
+    e.stopPropagation();
+    const it = e.target.closest('.mi');
+    if (it && !it.dataset.ex) closeMenus(); // un exemple demande d'abord confirmation
+  });
+  m.addEventListener('keydown', e => {
+    const its = menuItems(m), i = its.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault(); its[(i + (e.key === 'ArrowDown' ? 1 : its.length - 1)) % its.length].focus();
+    } else if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault(); its[e.key === 'Home' ? 0 : its.length - 1].focus();
+    } else if (e.key === 'Escape' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const b = menuBtns.find(x => $(x.dataset.menu) === m), k = menuBtns.indexOf(b);
+      e.preventDefault(); e.stopPropagation();
+      if (e.key === 'Escape') { closeMenus(); b.focus(); return; }
+      const n = menuBtns[(k + (e.key === 'ArrowRight' ? 1 : menuBtns.length - 1)) % menuBtns.length];
+      openMenu(n); n.focus();
+    }
+  });
+});
 document.addEventListener('click', closeMenus);
 
-const exMenu = $('exMenu');
 function loadExample(k) { fileHandle = null; loadText(SAMPLES[k], null, k === 'flow' ? 'flow' : 'model'); }
-exMenu.addEventListener('click', e => {
+$('fileMenu').addEventListener('click', e => {
   const it = e.target.closest('[data-ex]');
   if (it) {
     const k = it.dataset.ex;
@@ -3017,6 +3140,12 @@ exMenu.addEventListener('click', e => {
 });
 $('exOk').onclick = e => { e.stopPropagation(); if (pendingEx) loadExample(pendingEx); closeMenu(); };
 $('exCancel').onclick = e => { e.stopPropagation(); closeMenu(); };
+
+// ---------- Aide : raccourcis et gestes ----------
+const helpModal = $('helpModal');
+$('btnShortcuts').onclick = () => { helpModal.hidden = false; $('helpClose').focus(); };
+$('helpClose').onclick = () => { helpModal.hidden = true; };
+helpModal.addEventListener('click', e => { if (e.target === helpModal) helpModal.hidden = true; });
 
 // ---------- Export SQL ----------
 function toSQL(d) {
@@ -3062,7 +3191,7 @@ $('btnSql').onclick = () => {
 };
 $('sqlClose').onclick = () => { $('modal').hidden = true; };
 $('modal').addEventListener('click', e => { if (e.target === $('modal')) $('modal').hidden = true; });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('modal').hidden = true; imgModal.hidden = true; closeMenu(); if (trace) { trace = null; renderAll(); } clearMultiSel(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('modal').hidden = true; imgModal.hidden = true; helpModal.hidden = true; closeMenu(); if (trace) { trace = null; renderAll(); } clearMultiSel(); } });
 $('sqlCopy').onclick = () => copyText($('sqlOut').value, $('sqlCopy'), 'SQL copié dans le presse-papier');
 $('sqlSave').onclick = async () => {
   const name = baseName() + (inViewer ? '.sql.txt' : '.sql');

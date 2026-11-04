@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { menu } = require('./helpers');
 
 // Same setup as app.spec.js: collect console/page errors, forbid any network request.
 let errors, external;
@@ -14,8 +15,7 @@ test.beforeEach(async ({ page, baseURL }) => {
 test.afterEach(() => { expect(external, 'no network request expected').toEqual([]); expect(errors).toEqual([]); });
 
 async function loadExample(page, key) {
-  await page.click('#btnExamples');
-  await page.click(`button.mi[data-ex="${key}"]`);
+  await menu(page, '#btnFile', `button.mi[data-ex="${key}"]`);
   if (await page.locator('#exOk').isVisible()) await page.click('#exOk');
   await expect(page.locator('#status')).toHaveClass(/ok/);
 }
@@ -50,24 +50,20 @@ test('« Masquer » lives in the editor header, hides the editor, and it can be 
   await expect(btn).toBeVisible();
 });
 
-test('help text moved out of the bottom bar into a popover', async ({ page }) => {
-  await expect(page.locator('#helpPop')).toBeHidden();
-  await page.click('#btnHelp');
-  await expect(page.locator('#helpPop')).toBeVisible();
-  await expect(page.locator('#helpPop')).toContainText('Maj+glisser');
-  await expect(page.locator('.toolbar')).not.toContainText('Maj+glisser');
-});
-
-test('help button never sits under the bottom toolbar, even on a narrow canvas', async ({ page }) => {
+test('menu bar is fully visible and its four menus do not overlap (1280, 1024, 900 px)', async ({ page }) => {
   for (const width of [1280, 1024, 900]) {
     await page.setViewportSize({ width, height: 720 });
-    const [b, t] = await Promise.all([page.locator('#btnHelp').boundingBox(), page.locator('.toolbar').boundingBox()]);
-    const overlap = b.x < t.x + t.width && t.x < b.x + b.width && b.y < t.y + t.height && t.y < b.y + b.height;
-    expect(overlap, `overlap at ${width}px`).toBe(false);
-    await page.click('#btnHelp');
-    await expect(page.locator('#helpPop')).toBeVisible();
-    await page.click('#btnHelp');
-    await expect(page.locator('#helpPop')).toBeHidden();
+    const boxes = await page.locator('#menubar > .menu-wrap > button').evaluateAll(bs => bs.map(b => { const r = b.getBoundingClientRect(); return { x: r.x, y: r.y, r: r.right, b: r.bottom, t: b.textContent }; }));
+    expect(boxes.map(x => x.t)).toEqual(['Fichier', 'Édition', 'Exporter', 'Aide']);
+    for (const [i, a] of boxes.entries()) {
+      expect(a.x, `left edge at ${width}px`).toBeGreaterThanOrEqual(0);
+      expect(a.r, `right edge at ${width}px`).toBeLessThanOrEqual(width);
+      for (const b of boxes.slice(i + 1)) {
+        const overlap = a.x < b.r && b.x < a.r && a.y < b.b && b.y < a.b;
+        expect(overlap, `overlap at ${width}px`).toBe(false);
+      }
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   }
 });
 
@@ -118,8 +114,7 @@ test('selection focus survives hovering (existing select behaviour)', async ({ p
 // ---- Export follows the canvas ----
 const fs = require('fs');
 async function exportImage(page, fmt) {
-  await page.click('#btnExport');
-  await page.click('#btnImage');
+  await menu(page, '#btnExport', '#btnImage');
   await page.locator(`#imgForm label:has(input[name="fmt"][value="${fmt}"])`).click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.click('#imgGo')]);
   return fs.readFileSync(await download.path());
@@ -143,11 +138,18 @@ test('conceptual view at zoom 30 %: exported entities are enlarged like on the c
   await loadExample(page, 'shop');
   await page.click('#btnConcept');
   await expect(page.locator('#world')).toHaveClass(/concept/);
+  await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))); // let the deferred fit() run
   await setZoom(page, 0.3);
   const k = await page.evaluate(() => window.dbmlStudio.zoom);
-  const canvasW = await page.locator('#nodesLayer .node[data-id="t:orders"] .body').evaluate(el => el.getBoundingClientRect().width);
-  const baseW = await page.locator('#nodesLayer .node[data-id="t:orders"] .body').evaluate(el => +el.getAttribute('width'));
+  // Read the canvas in a single evaluate, through querySelector: the nodes can be re-rendered asynchronously
+  // (e.g. the rebuild once web fonts settle), and a locator handle resolved just before may then point to a
+  // detached element (zero rect, no computed transform), which made this test flaky.
+  const { canvasW, baseW } = await page.evaluate(() => {
+    const b = document.querySelector('#nodesLayer .node[data-id="t:orders"] .body');
+    return { canvasW: b.getBoundingClientRect().width, baseW: +b.getAttribute('width') };
+  });
   const factor = canvasW / k / baseW; // enlargement shown on the canvas
+  expect(factor).toBeCloseTo(Math.pow(1 / k, 0.5), 1);
   expect(factor).toBeGreaterThan(1.5);
   await expect(page.locator('#edgesLayer .card').first()).toBeVisible();
   const svg = (await exportImage(page, 'svg')).toString('utf8');
