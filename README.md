@@ -141,7 +141,7 @@ Un point à droite du nom signale un champ décrit. Le survol d'un champ affiche
 
 **Verrouillage** : le bouton « Verrouiller » de la barre d'outils ouvre un panneau classé par type (Régions, Tables, Énumérations), chaque section avec sa case « Toutes », plus une case « Tout verrouiller » en tête pour l'ensemble. Un élément verrouillé (glyphe cadenas) ne peut plus être déplacé, mais reste cliquable pour la sélection et le focus éditeur. Cliquer-glisser sur un élément verrouillé fait défiler la vue (comme sur le fond du canvas) au lieu de ne rien faire. Verrouiller une région verrouille aussi ses membres, repliée ou non.
 
-**Aide et survol** : le bouton « ? » en bas à gauche du canvas ouvre un rappel des gestes (il se ferme d'un clic ailleurs). Survoler une table (souris seulement) met ses relations en évidence et atténue le reste, en vue détaillée comme en vue conceptuelle. L'éditeur a un en-tête « Code DBML » avec le bouton « Masquer ».
+**Aide et survol** : le bouton « ? » en haut à gauche du canvas ouvre un rappel des gestes (il se ferme d'un clic ailleurs). Survoler une table (souris seulement) met ses relations en évidence et atténue le reste, en vue détaillée comme en vue conceptuelle. L'éditeur a un en-tête « Code DBML » avec le bouton « Masquer ».
 
 **Défilement automatique** : glisser une table ou une région près du bord du canvas fait défiler la vue pour suivre le déplacement, sans à-coup au relâchement.
 

@@ -58,6 +58,19 @@ test('help text moved out of the bottom bar into a popover', async ({ page }) =>
   await expect(page.locator('.toolbar')).not.toContainText('Maj+glisser');
 });
 
+test('help button never sits under the bottom toolbar, even on a narrow canvas', async ({ page }) => {
+  for (const width of [1280, 1024, 900]) {
+    await page.setViewportSize({ width, height: 720 });
+    const [b, t] = await Promise.all([page.locator('#btnHelp').boundingBox(), page.locator('.toolbar').boundingBox()]);
+    const overlap = b.x < t.x + t.width && t.x < b.x + b.width && b.y < t.y + t.height && t.y < b.y + b.height;
+    expect(overlap, `overlap at ${width}px`).toBe(false);
+    await page.click('#btnHelp');
+    await expect(page.locator('#helpPop')).toBeVisible();
+    await page.click('#btnHelp');
+    await expect(page.locator('#helpPop')).toBeHidden();
+  }
+});
+
 test('detailed view keeps full tables at any zoom (no names-only mode)', async ({ page }) => {
   await loadExample(page, 'shop');
   const colCount = await page.locator('#nodesLayer .cname').count();
