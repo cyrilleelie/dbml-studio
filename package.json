@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "node build.mjs",
+    "icons": "node scripts/icons.mjs",
     "test": "playwright test",
     "test:unit": "node --test test/parser.test.mjs test/autocomplete.test.mjs"
   },
