@@ -58,33 +58,18 @@ test('help text moved out of the bottom bar into a popover', async ({ page }) =>
   await expect(page.locator('.toolbar')).not.toContainText('Maj+glisser');
 });
 
-test('semantic zoom: compact tables below the threshold, full tables above', async ({ page }) => {
+test('detailed view keeps full tables at any zoom (no names-only mode)', async ({ page }) => {
   await loadExample(page, 'shop');
-  const threshold = await page.evaluate(() => window.dbmlStudio.SEMANTIC_ZOOM_MIN);
-  expect(threshold).toBeGreaterThan(0.3);
-  expect(threshold).toBeLessThan(0.8);
-  await setZoom(page, 1);
+  const colCount = await page.locator('#nodesLayer .cname').count();
+  expect(colCount).toBeGreaterThan(20);
+  await setZoom(page, 0.3);
+  await expect(page.locator('#nodesLayer .cname')).toHaveCount(colCount);
+  await expect(page.locator('#nodesLayer .node.table').first().locator('.ctype').first()).toBeAttached();
   await expect(page.locator('#svg')).not.toHaveClass(/compact/);
-  await expect(page.locator('#nodesLayer .node.compact')).toHaveCount(0);
-  await expect(page.locator('#nodesLayer .cname').first()).toBeAttached();
-  // zoom out through the controls
-  await setZoom(page, 0.7);
+  await expect(page.locator('#nodesLayer .compact')).toHaveCount(0);
+  // zoom out with the controls as well
   for (let i = 0; i < 3; i++) await page.click('#zOut');
-  await expect(page.locator('#svg')).toHaveClass(/compact/);
-  await expect(page.locator('#nodesLayer .node.table.compact')).toHaveCount(9);
-  await expect(page.locator('#nodesLayer .cname')).toHaveCount(0);
-  const titles = await page.locator('#nodesLayer .node.table.compact text.title').allTextContents();
-  expect(titles.some(t => t.trim().startsWith('orders'))).toBe(true);
-  // region labels keep a constant on-screen size: scale = 1/zoom
-  const k = await page.evaluate(() => window.dbmlStudio.zoom);
-  const scale = await page.locator('#groupsLayer text.glabel').first().evaluate(t => t.transform.baseVal.getItem(1).matrix.a);
-  expect(scale).toBeCloseTo(1 / k, 1);
-  // edges stay attached to the (shorter) compact node
-  await expect(page.locator('#edgesLayer .edge').first()).toBeAttached();
-  await setZoom(page, 1);
-  await expect(page.locator('#svg')).not.toHaveClass(/compact/);
-  await expect(page.locator('#nodesLayer .node.compact')).toHaveCount(0);
-  await expect(page.locator('#nodesLayer .cname').first()).toBeAttached();
+  await expect(page.locator('#nodesLayer .cname')).toHaveCount(colCount);
 });
 
 test('hovering a table highlights its edges and dims the others', async ({ page }) => {
@@ -117,18 +102,114 @@ test('selection focus survives hovering (existing select behaviour)', async ({ p
   await expect(page.locator('#edgesLayer .edge.hot').first()).toBeAttached(); // selection focus survives hover end
 });
 
-test('SVG export stays complete when zoomed out', async ({ page }) => {
-  await loadExample(page, 'shop');
-  await setZoom(page, 0.3);
-  await expect(page.locator('#svg')).toHaveClass(/compact/);
+// ---- Export follows the canvas ----
+const fs = require('fs');
+async function exportImage(page, fmt) {
   await page.click('#btnExport');
   await page.click('#btnImage');
-  await page.locator('#imgForm label:has(input[name="fmt"][value="svg"])').click();
+  await page.locator(`#imgForm label:has(input[name="fmt"][value="${fmt}"])`).click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.click('#imgGo')]);
-  const content = require('fs').readFileSync(await download.path(), 'utf8');
-  for (const col of ['shipping_address_id', 'unit_price', 'created_at']) expect(content).toContain(col);
-  expect(content).toContain('order_items');
-  // the on-screen view returns to compact afterwards
-  await expect(page.locator('#svg')).toHaveClass(/compact/);
-  await expect(page.locator('#nodesLayer .node.compact').first()).toBeAttached();
+  return fs.readFileSync(await download.path());
+}
+// Opens an exported SVG as a standalone document in a second page and runs fn in it.
+async function inExported(page, svg, fn, arg) {
+  const p2 = await page.context().newPage();
+  try {
+    await p2.goto('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+    return await p2.evaluate(fn, arg);
+  } finally { await p2.close(); }
+}
+const pngSize = buf => ({ w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) });
+const canvasIds = page => page.evaluate(() => [...document.querySelectorAll('#nodesLayer .node')].map(n => n.dataset.id).sort());
+const exportedStats = (page, svg) => inExported(page, svg, () => ({
+  ids: [...document.querySelectorAll('.node')].map(n => n.dataset.id).sort(),
+  edges: document.querySelectorAll('.edge').length
+}));
+
+test('conceptual view at zoom 30 %: exported entities are enlarged like on the canvas, hidden cardinalities stay hidden', async ({ page }) => {
+  await loadExample(page, 'shop');
+  await page.click('#btnConcept');
+  await expect(page.locator('#world')).toHaveClass(/concept/);
+  await setZoom(page, 0.3);
+  const k = await page.evaluate(() => window.dbmlStudio.zoom);
+  const canvasW = await page.locator('#nodesLayer .node[data-id="t:orders"] .body').evaluate(el => el.getBoundingClientRect().width);
+  const baseW = await page.locator('#nodesLayer .node[data-id="t:orders"] .body').evaluate(el => +el.getAttribute('width'));
+  const factor = canvasW / k / baseW; // enlargement shown on the canvas
+  expect(factor).toBeGreaterThan(1.5);
+  await expect(page.locator('#edgesLayer .card').first()).toBeVisible();
+  const svg = (await exportImage(page, 'svg')).toString('utf8');
+  expect(svg).not.toContain('var(--');
+  const exp = await inExported(page, svg, () => {
+    const b = document.querySelector('.node[data-id="t:orders"] .body').getBoundingClientRect();
+    const line = document.querySelector('.edge .line');
+    return { w: b.width, lineW: parseFloat(getComputedStyle(line).strokeWidth), cardShown: [...document.querySelectorAll('.edge .card')].some(c => getComputedStyle(c).display !== 'none') };
+  });
+  expect(exp.w / baseW).toBeCloseTo(factor, 1);
+  expect(exp.lineW).toBeCloseTo(1.9 * factor, 1);
+  expect(exp.cardShown).toBe(true);
+  // nothing cropped: every entity lies inside the exported canvas
+  const inside = await inExported(page, svg, () => {
+    const r = document.documentElement.getBoundingClientRect();
+    return [...document.querySelectorAll('.node .body')].every(n => { const b = n.getBoundingClientRect(); return b.left >= 0 && b.top >= 0 && b.right <= r.width && b.bottom <= r.height; });
+  });
+  expect(inside).toBe(true);
+  // below the card threshold, cardinalities are hidden on the canvas and in the export
+  await setZoom(page, 0.2);
+  await expect(page.locator('#world')).toHaveClass(/nocard/);
+  const svg2 = (await exportImage(page, 'svg')).toString('utf8');
+  const shown = await inExported(page, svg2, () => [...document.querySelectorAll('.edge .card')].filter(c => getComputedStyle(c).display !== 'none').length);
+  expect(shown).toBe(0);
+});
+
+test('SVG export has the same nodes and edges as the canvas, also after hiding elements', async ({ page }) => {
+  await loadExample(page, 'shop');
+  await setZoom(page, 0.5);
+  let svg = (await exportImage(page, 'svg')).toString('utf8');
+  let st = await exportedStats(page, svg);
+  expect(st.ids).toEqual(await canvasIds(page));
+  expect(st.edges).toBe(await page.locator('#edgesLayer .edge').count());
+  const before = st.ids.length;
+  // hide two tables via the display panel
+  await page.click('#btnDisplayPanel');
+  await page.locator('#displayPanel input[data-hide="t:returns"]').uncheck();
+  await page.locator('#displayPanel input[data-hide="t:tags"]').uncheck();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#nodesLayer .node')).toHaveCount(before - 2);
+  svg = (await exportImage(page, 'svg')).toString('utf8');
+  st = await exportedStats(page, svg);
+  expect(st.ids).toEqual(await canvasIds(page));
+  expect(st.ids).not.toContain('t:returns');
+  expect(st.edges).toBe(await page.locator('#edgesLayer .edge').count());
+  // same in conceptual view
+  await page.click('#btnConcept');
+  await setZoom(page, 0.4);
+  svg = (await exportImage(page, 'svg')).toString('utf8');
+  st = await exportedStats(page, svg);
+  expect(st.ids).toEqual(await canvasIds(page));
+  expect(st.edges).toBe(await page.locator('#edgesLayer .edge').count());
+});
+
+test('SVG export keeps the lane bands styled (no default black rectangles)', async ({ page }) => {
+  await loadExample(page, 'flow');
+  await page.click('#btnDisplayPanel');
+  await page.locator('#displayPanel input[data-lanes]').check();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#lanesLayer .lane-band').first()).toBeAttached();
+  const n = await page.locator('#lanesLayer .lane-band').count();
+  const svg = (await exportImage(page, 'svg')).toString('utf8');
+  const r = await inExported(page, svg, () => [...document.querySelectorAll('.lane-band .lb-fill')].map(el => {
+    const cs = getComputedStyle(el); return { fill: cs.fill, op: +cs.fillOpacity };
+  }));
+  expect(r.length).toBe(n);
+  for (const x of r) expect(x.op).toBeLessThan(0.2);
+});
+
+test('detailed-view PNG export does not depend on the zoom', async ({ page }) => {
+  await loadExample(page, 'shop');
+  await setZoom(page, 1);
+  const a = pngSize(await exportImage(page, 'png'));
+  await setZoom(page, 0.3);
+  const b = pngSize(await exportImage(page, 'png'));
+  expect(b).toEqual(a);
+  expect(a.w).toBeGreaterThan(500);
 });
