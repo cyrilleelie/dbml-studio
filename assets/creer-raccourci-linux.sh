@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Crée un lanceur « DBML Studio » dans le menu des applications (icône incluse).
 D="$(cd "$(dirname "$0")/.." && pwd)"
-F="$D/dist/dbml-studio.html"; [ -f "$F" ] || F="$(ls "$D"/dbml-studio*.html | head -1)"
+F="$D/index.html"
+[ -f "$F" ] || { echo "index.html introuvable à la racine du dépôt." >&2; exit 1; }
 mkdir -p "$HOME/.local/share/applications"
 cat > "$HOME/.local/share/applications/dbml-studio.desktop" <<EOF
 [Desktop Entry]

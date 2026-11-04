@@ -20,9 +20,18 @@
 - Enregistrement du fichier en cours (Ctrl/⌘ S), positions et replis conservés dans le fichier lui-même, et export du schéma en image (PNG, JPG, WebP, SVG)
 - Export SQL PostgreSQL (copie ou téléchargement) et export en DBML standard
 
+## Utiliser la version en ligne
+
+Adresse : <https://cyrilleelie.github.io/dbml-studio/>
+
+- Elle est mise à jour automatiquement à chaque push sur `main` (workflow `.github/workflows/pages.yml`). L'activation se fait une seule fois dans Settings > Pages > Source : GitHub Actions.
+- Rien n'est envoyé à un serveur : tout reste dans le navigateur.
+- Le code et la disposition sont sauvegardés dans le `localStorage` de ce site. La version en ligne et le fichier ouvert en local ont chacun leur propre sauvegarde : pour passer de l'un à l'autre, Enregistrer le fichier `.dbml` puis l'ouvrir dans l'autre.
+- L'origine `cyrilleelie.github.io` est partagée par tous les sites Pages du compte : leurs `localStorage` sont accessibles entre eux.
+
 ## Utiliser
 
-Ouvrir `dist/dbml-studio.html` dans un navigateur récent (Chrome, Edge, Firefox, Safari 16.4+).
+Ouvrir `index.html` (le fichier à la racine du dépôt) dans un navigateur récent (Chrome, Edge, Firefox, Safari 16.4+).
 Le fichier est autonome : il fonctionne hors ligne et peut être distribué tel quel.
 Seules les polices IBM Plex viennent de Google Fonts ; sans réseau, les polices système prennent le relais.
 
@@ -33,16 +42,20 @@ Le code et la disposition du diagramme sont sauvegardés dans le `localStorage` 
 Prérequis : Node 18+ (aucune dépendance npm).
 
 ```
-npm run build   # assemble dist/dbml-studio.html
-npm test        # tests du parser
+npm run build      # régénère index.html (à versionner)
+npm run test:unit  # tests Node du parser et de l'autocomplétion
+npm test           # tests Playwright (e2e)
 ```
+
+Ne jamais éditer `index.html` à la main : il est généré par `build.mjs` à partir de `src/`. La CI vérifie qu'il est à jour.
 
 | Fichier | Rôle |
 |---|---|
 | `src/autocomplete.js` | Moteur d'autocomplétion : analyse du contexte au curseur et suggestions. Sans dépendance au DOM, testé sous Node |
 | `src/parser.js` | Tokenizer, parser DBML et validation. Sans dépendance, utilisable dans le navigateur et sous Node |
-| `src/index.html` | Interface : CSS, rendu SVG, interactions, export SQL. Contient les marqueurs d'injection |
-| `examples/*.dbml` | Exemples du menu « Exemples » (déclarés dans `build.mjs` et dans le menu de `index.html`) |
+| `index.html` | Livrable généré par `build.mjs` (fichier autonome, versionné, servi par GitHub Pages) ; ne pas l'éditer |
+| `src/index.html` | Gabarit : interface, CSS, rendu SVG, interactions, export SQL. Contient les marqueurs d'injection |
+| `examples/*.dbml` | Exemples du menu « Exemples » (déclarés dans `build.mjs` et dans le menu de `src/index.html`) |
 | `vendor/dagre.min.js` | dagre 0.8.5 (licence MIT, voir `vendor/dagre.LICENSE`), injecté pour le fonctionnement hors ligne |
 | `build.mjs` | Injecte dagre, le parser et les exemples dans le gabarit HTML |
 

@@ -10,6 +10,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Vérifier que index.html est à jour
+        run: |
+          npm run build
+          git diff --exit-code index.html || { echo "::error::index.html n'est pas à jour : lancer « npm run build » puis versionner index.html."; exit 1; }
       - run: npx playwright install --with-deps chromium
       - run: npm run test:unit
       - run: npm test
