@@ -141,11 +141,15 @@ test('conceptual view at zoom 30 %: exported entities are enlarged like on the c
   await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))); // let the deferred fit() run
   await setZoom(page, 0.3);
   const k = await page.evaluate(() => window.dbmlStudio.zoom);
-  const baseW = await page.locator('#nodesLayer .node[data-id="t:orders"] .body').evaluate(el => +el.getAttribute('width'));
-  // Enlargement applied on the canvas, read from the computed CSS transform of the entity's scale group.
-  // (getBoundingClientRect() on a transform-box:fill-box SVG group intermittently returned 0 on the CI runner.)
-  const factor = await page.locator('#nodesLayer .node[data-id="t:orders"] .cscale').evaluate(el => new DOMMatrixReadOnly(getComputedStyle(el).transform).a);
-  expect(factor).toBeCloseTo(Math.pow(1 / k, 0.5), 2);
+  // Read the canvas in a single evaluate, through querySelector: the nodes can be re-rendered asynchronously
+  // (e.g. the rebuild once web fonts settle), and a locator handle resolved just before may then point to a
+  // detached element (zero rect, no computed transform), which made this test flaky.
+  const { canvasW, baseW } = await page.evaluate(() => {
+    const b = document.querySelector('#nodesLayer .node[data-id="t:orders"] .body');
+    return { canvasW: b.getBoundingClientRect().width, baseW: +b.getAttribute('width') };
+  });
+  const factor = canvasW / k / baseW; // enlargement shown on the canvas
+  expect(factor).toBeCloseTo(Math.pow(1 / k, 0.5), 1);
   expect(factor).toBeGreaterThan(1.5);
   await expect(page.locator('#edgesLayer .card').first()).toBeVisible();
   const svg = (await exportImage(page, 'svg')).toString('utf8');
