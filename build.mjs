@@ -1,7 +1,7 @@
-// Assemble dist/dbml-studio.html : un seul fichier autonome, utilisable hors ligne.
+// Assemble index.html à la racine : un seul fichier autonome, utilisable hors ligne.
+// C'est le livrable versionné (tests Playwright, GitHub Pages) ; ne jamais l'éditer à la main.
 // Usage : node build.mjs   (aucune dépendance, Node 18+)
-import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
-import { join, basename } from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const read = p => readFileSync(new URL(p, import.meta.url), 'utf8');
 
@@ -21,6 +21,5 @@ inject('/*__PARSER__*/', read('src/parser.js'));
 inject('/*__AUTOCOMPLETE__*/', read('src/autocomplete.js'));
 inject('/*__SAMPLES__*/', JSON.stringify(samples).replace(/<\//g, '<\\/'));
 
-mkdirSync(new URL('dist/', import.meta.url), { recursive: true });
-writeFileSync(new URL('dist/dbml-studio.html', import.meta.url), html);
-console.log(`dist/dbml-studio.html généré (${(html.length / 1024).toFixed(0)} Ko)`);
+writeFileSync(new URL('index.html', import.meta.url), html);
+console.log(`index.html généré (${(html.length / 1024).toFixed(0)} Ko)`);

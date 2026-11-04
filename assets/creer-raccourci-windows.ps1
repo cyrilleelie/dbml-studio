@@ -1,8 +1,8 @@
 # Crée un raccourci « DBML Studio » sur le Bureau (icône incluse).
 # Usage : clic droit > Exécuter avec PowerShell, depuis le dossier du projet.
 $racine = Split-Path -Parent $PSScriptRoot
-$html   = Join-Path $racine 'dist\dbml-studio.html'
-if (-not (Test-Path $html)) { $html = (Get-ChildItem $racine -Filter 'dbml-studio*.html' | Select-Object -First 1).FullName }
+$html   = Join-Path $racine 'index.html'
+if (-not (Test-Path $html)) { Write-Error 'index.html introuvable à la racine du dépôt.'; exit 1 }
 $ws = New-Object -ComObject WScript.Shell
 $lnk = $ws.CreateShortcut((Join-Path ([Environment]::GetFolderPath('Desktop')) 'DBML Studio.lnk'))
 $lnk.TargetPath   = $html
