@@ -318,25 +318,14 @@ button{font:inherit;color:inherit}
 .del-list .k{color:var(--muted);font-size:11.5px}
 .del-warn{color:var(--danger);font-size:12.5px;margin:0}
 
-/* Palette de commandes et aide */
+/* Aide */
 .sheet.narrow{width:min(560px,100%)}
 .helpbody{padding:4px 16px 14px;overflow-y:auto;font-size:13px}
 .helpbody h3{margin:12px 0 4px;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .helpbody dl{display:grid;grid-template-columns:max-content 1fr;gap:5px 16px;margin:0}
 .helpbody dt{color:var(--ink-2);font-weight:500}
 .helpbody dd{margin:0;color:var(--ink-2)}
-.helpbody kbd,.pal kbd{font:11.5px var(--sans);color:var(--muted)}
-.pal-modal{align-items:flex-start;padding-top:12vh}
-.pal{width:min(560px,100%);background:var(--bar);border:1px solid var(--bar-line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
-.pal input{width:100%;border:0;border-bottom:1px solid var(--bar-line);background:transparent;color:var(--ink);font:15px var(--sans);padding:12px 14px;outline:none}
-.pal ul{list-style:none;margin:0;padding:6px;max-height:min(50vh,360px);overflow-y:auto}
-.pal li{display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:6px;cursor:pointer;font-size:13.5px}
-.pal li.sel{background:var(--btn-hover)}
-.pal li.off{opacity:.45;cursor:default}
-.pal .pg{color:var(--muted);font-size:11.5px;min-width:76px}
-.pal .pl{flex:1;min-width:0}
-.pal .pl small{color:var(--muted);margin-left:8px;font-size:11.5px}
-.pal .none{color:var(--muted);cursor:default}
+.helpbody kbd{font:11.5px var(--sans);color:var(--muted)}
 
 /* Modale SQL */
 .modal{position:fixed;inset:0;background:rgba(10,20,30,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:10}
@@ -403,7 +392,6 @@ button{font:inherit;color:inherit}
       <div class="menu-wrap">
         <button class="btn mb" id="btnAide" data-menu="helpMenu" role="menuitem" aria-haspopup="true" aria-expanded="false">Aide</button>
         <div class="menu" id="helpMenu" role="menu" aria-label="Aide" hidden>
-          <button class="mi row" role="menuitem" id="btnPalette">Palette de commandes<kbd data-kbd="K"></kbd></button>
           <button class="mi" role="menuitem" id="btnShortcuts">Raccourcis et gestes…</button>
           <a class="mi" role="menuitem" id="lnkSyntax" href="https://dbml.dbdiagram.io/docs/" target="_blank" rel="noopener">Syntaxe DBML ↗</a>
         </div>
@@ -464,16 +452,16 @@ button{font:inherit;color:inherit}
         </div>
         <span class="sep"></span>
         <div class="tgroup" role="group" aria-label="Affichage">
-          <button class="btn" id="btnConcept" aria-pressed="false" data-cmd="Affichage" data-label="Vue conceptuelle" data-sub="Cardinalités, sans attributs ni flux" aria-label="Vue conceptuelle" title="Vue conceptuelle : tables et relations avec cardinalités, sans attributs ni flux">Vue conceptuelle</button>
-          <button class="btn" id="btnDisplayPanel" aria-haspopup="true" aria-expanded="false" data-cmd="Affichage" data-label="Éléments affichés…" aria-label="Éléments affichés" title="Éléments affichés : choisir ce qui est visible">Éléments affichés</button>
-          <button class="btn" id="btnFit" data-cmd="Affichage" data-label="Tout afficher" aria-label="Tout afficher" title="Tout afficher : ajuster le zoom au schéma">Tout afficher</button>
-          <button class="btn" id="btnToggleEditor" aria-pressed="true" data-cmd="Affichage" data-label="Masquer l’éditeur" data-kbd="B" aria-label="Éditeur" title="Masquer l’éditeur (Ctrl/⌘ B)">Éditeur</button>
+          <button class="btn" id="btnConcept" aria-pressed="false" aria-label="Vue conceptuelle" title="Vue conceptuelle : tables et relations avec cardinalités, sans attributs ni flux">Vue conceptuelle</button>
+          <button class="btn" id="btnDisplayPanel" aria-haspopup="true" aria-expanded="false" aria-label="Éléments affichés" title="Éléments affichés : choisir ce qui est visible">Éléments affichés</button>
+          <button class="btn" id="btnFit" aria-label="Tout afficher" title="Tout afficher : ajuster le zoom au schéma">Tout afficher</button>
+          <button class="btn" id="btnToggleEditor" aria-pressed="true" aria-label="Éditeur" title="Masquer l’éditeur (Ctrl/⌘ B)">Éditeur</button>
         </div>
         <span class="sep"></span>
         <div class="tgroup" role="group" aria-label="Disposition">
-          <button class="btn" id="btnLayout" data-cmd="Disposition" data-label="Réorganiser" data-sub="Recalcule la disposition automatique" aria-label="Réorganiser" title="Réorganiser : recalcule la disposition automatique">Réorganiser</button>
-          <button class="btn" id="btnCollapseAll" data-cmd="Disposition" data-label="Tout replier" aria-label="Tout replier" title="Tout replier ou déplier les tables">Tout replier</button>
-          <button class="btn" id="btnLockPanel" aria-haspopup="true" aria-expanded="false" data-cmd="Disposition" data-label="Verrouiller les positions…" aria-label="Verrouiller les positions" title="Verrouiller les positions : choisir les éléments à figer">Verrouiller</button>
+          <button class="btn" id="btnLayout" aria-label="Réorganiser" title="Réorganiser : recalcule la disposition automatique">Réorganiser</button>
+          <button class="btn" id="btnCollapseAll" aria-label="Tout replier" title="Tout replier ou déplier les tables">Tout replier</button>
+          <button class="btn" id="btnLockPanel" aria-haspopup="true" aria-expanded="false" aria-label="Verrouiller les positions" title="Verrouiller les positions : choisir les éléments à figer">Verrouiller</button>
         </div>
       </div>
     </section>
@@ -486,7 +474,6 @@ button{font:inherit;color:inherit}
     <div class="helpbody">
       <h3>Clavier</h3>
       <dl>
-        <dt><kbd data-kbd="K"></kbd></dt><dd>Palette de commandes</dd>
         <dt><kbd data-kbd="S"></kbd></dt><dd>Enregistrer (avec Maj : enregistrer sous)</dd>
         <dt><kbd data-kbd="O"></kbd></dt><dd>Ouvrir un fichier</dd>
         <dt><kbd data-kbd="F"></kbd></dt><dd>Rechercher / remplacer dans le code</dd>
@@ -507,12 +494,6 @@ button{font:inherit;color:inherit}
         <dt>Alt + molette</dt><dd>Défiler verticalement</dd>
       </dl>
     </div>
-  </div>
-</div>
-<div class="modal pal-modal" id="palette" hidden>
-  <div class="pal" role="dialog" aria-modal="true" aria-label="Palette de commandes">
-    <input type="text" id="palInput" placeholder="Taper une commande…" role="combobox" aria-expanded="true" aria-controls="palList" aria-autocomplete="list" autocomplete="off" spellcheck="false">
-    <ul id="palList" role="listbox" aria-label="Commandes"></ul>
   </div>
 </div>
 
@@ -1822,7 +1803,7 @@ function renderAll() {
   renderGroups(); renderEdges(); renderNodes();
   const all = nodes.length > 0 && nodes.every(n => collapsed.has(n.id));
   const ca = $('btnCollapseAll');
-  ca.textContent = ca.dataset.label = all ? 'Tout déplier' : 'Tout replier';
+  ca.textContent = all ? 'Tout déplier' : 'Tout replier';
   ca.setAttribute('aria-label', ca.textContent);
 }
 // ---------- Ajustement automatique de la disposition ----------
@@ -2831,8 +2812,7 @@ function setEditorCollapsed(v) {
   splitEl.classList.toggle('editor-collapsed', v);
   $('btnReopenEditor').hidden = !v;
   const te = $('btnToggleEditor');
-  te.dataset.label = v ? 'Afficher l’éditeur' : 'Masquer l’éditeur';
-  te.title = te.dataset.label + ' (Ctrl/⌘ B)';
+  te.title = (v ? 'Afficher l’éditeur' : 'Masquer l’éditeur') + ' (Ctrl/⌘ B)';
   te.setAttribute('aria-pressed', String(!v));
   store.set(LS_EDCOL, v ? '1' : '');
   requestAnimationFrame(fit);
@@ -3166,90 +3146,6 @@ const helpModal = $('helpModal');
 $('btnShortcuts').onclick = () => { helpModal.hidden = false; $('helpClose').focus(); };
 $('helpClose').onclick = () => { helpModal.hidden = true; };
 helpModal.addEventListener('click', e => { if (e.target === helpModal) helpModal.hidden = true; });
-
-// ---------- Palette de commandes (Ctrl/⌘ K) ----------
-// Les commandes sont lues dans les menus (tout élément .mi visible, avec le nom du menu comme groupe)
-// et dans la barre du canvas (boutons data-cmd : groupes Affichage et Disposition).
-const palette = $('palette'), palInput = $('palInput'), palList = $('palList');
-let palCmds = [], palShown = [], palSel = 0, palPrev = null;
-const fold = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-function collectCommands() {
-  refreshMenuState();
-  const out = [];
-  document.querySelectorAll('.menu-wrap').forEach(w => {
-    const btn = w.querySelector('[data-menu]');
-    if (!btn) return;
-    w.querySelectorAll('.menu .mi').forEach(el => {
-      if (el.hidden) return;
-      const label = [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim();
-      const sub = el.querySelector('small'), kbd = el.querySelector('kbd');
-      out.push({ el, group: btn.textContent.trim(), label, sub: sub ? sub.textContent : '', kbd: kbd ? kbd.textContent : '', off: !!el.disabled });
-    });
-  });
-  // commandes du canvas (Affichage, Disposition) : boutons de la barre du canvas, avant « Exporter »
-  const canvas = [...document.querySelectorAll('.toolbar [data-cmd]')].filter(el => !el.hidden).map(el => ({
-    el, group: el.dataset.cmd, label: el.dataset.label, sub: el.dataset.sub || '',
-    kbd: el.dataset.kbd ? (isMac ? '⌘' : 'Ctrl ') + el.dataset.kbd : '', off: el.disabled }));
-  const at = out.findIndex(c => c.group === 'Exporter');
-  out.splice(at < 0 ? out.length : at, 0, ...canvas);
-  return out;
-}
-function palFilter() {
-  const words = fold(palInput.value).split(/\s+/).filter(Boolean);
-  const scored = [];
-  palCmds.forEach((c, i) => {
-    const hay = fold(`${c.group} ${c.label} ${c.sub}`), lab = fold(c.label);
-    if (!words.every(w => hay.includes(w))) return;
-    scored.push({ c, i, r: words.length && lab.startsWith(words[0]) ? 0 : words.every(w => lab.includes(w)) ? 1 : 2 });
-  });
-  palShown = scored.sort((a, b) => a.r - b.r || a.i - b.i).map(x => x.c);
-  palSel = Math.max(0, palShown.findIndex(c => !c.off));
-  palRender();
-}
-function palRender() {
-  palList.innerHTML = palShown.length ? palShown.map((c, i) =>
-    `<li role="option" id="pal${i}" data-i="${i}" class="${i === palSel ? 'sel' : ''}${c.off ? ' off' : ''}" aria-selected="${i === palSel}" aria-disabled="${c.off}"><span class="pg">${esc(c.group)}</span><span class="pl">${esc(c.label)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</span>${c.kbd ? `<kbd>${esc(c.kbd)}</kbd>` : ''}</li>`).join('')
-    : '<li class="none">Aucune commande</li>';
-  const cur = $('pal' + palSel);
-  if (cur) { palInput.setAttribute('aria-activedescendant', cur.id); cur.scrollIntoView({ block: 'nearest' }); } else palInput.removeAttribute('aria-activedescendant');
-}
-function openPalette() {
-  closeMenus();
-  palCmds = collectCommands(); palInput.value = '';
-  palPrev = document.activeElement;
-  palette.hidden = false; palFilter(); palInput.focus();
-}
-function closePalette(restore = true) {
-  if (palette.hidden) return;
-  palette.hidden = true;
-  if (restore && palPrev && palPrev.focus) palPrev.focus();
-}
-function runCommand(c) {
-  if (!c || c.off) return;
-  closePalette(false);
-  if (c.el.dataset.ex) openMenu($('btnFile')); // l'exemple passe par la confirmation du menu Fichier
-  c.el.click();
-}
-palInput.addEventListener('input', palFilter);
-palInput.addEventListener('keydown', e => {
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-    e.preventDefault();
-    const n = palShown.length; if (!n) return;
-    const d = e.key === 'ArrowDown' ? 1 : n - 1;
-    palSel = (palSel + d) % n; palRender();
-  } else if (e.key === 'Enter') { e.preventDefault(); runCommand(palShown[palSel]); }
-  else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closePalette(); }
-  else if (e.key === 'Tab') e.preventDefault();
-});
-palList.addEventListener('click', e => { e.stopPropagation(); const li = e.target.closest('li[data-i]'); if (li) runCommand(palShown[+li.dataset.i]); });
-palette.addEventListener('click', e => { e.stopPropagation(); if (e.target === palette) closePalette(); });
-$('btnPalette').onclick = openPalette;
-document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key || '').toLowerCase() === 'k') {
-    e.preventDefault();
-    if (palette.hidden) openPalette(); else closePalette();
-  }
-});
 
 // ---------- Export SQL ----------
 function toSQL(d) {

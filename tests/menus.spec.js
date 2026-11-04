@@ -139,101 +139,13 @@ test('Supprimer la sélection is disabled without selection', async ({ page }) =
   await expect(page.locator('#delModal')).toBeVisible();
 });
 
-test('Ctrl+K opens the palette, also from the editor; Escape closes', async ({ page }) => {
-  await page.click('#src');
-  await page.keyboard.press('Control+k');
-  await expect(page.locator('#palette')).toBeVisible();
-  await expect(page.locator('#palInput')).toBeFocused();
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#palette')).toBeHidden();
-  await expect(page.locator('#src')).toBeFocused();
-  await page.click('#btnAide');
-  await page.click('#btnPalette');
-  await expect(page.locator('#palette')).toBeVisible();
-});
-
-test('palette: « concept » filters to Vue conceptuelle and Enter toggles it', async ({ page }) => {
-  await page.keyboard.press('Control+k');
-  await page.keyboard.type('concept');
-  const rows = page.locator('#palList li');
-  await expect(rows).toHaveCount(1);
-  await expect(rows.first()).toContainText('Vue conceptuelle');
-  await expect(rows.first()).toContainText('Affichage');
-  await page.keyboard.press('Enter');
-  await expect(page.locator('#palette')).toBeHidden();
-  await expect(page.locator('#world')).toHaveClass(/concept/);
-});
-
-test('palette still offers every view and layout command, and runs them', async ({ page }) => {
-  await page.keyboard.press('Control+k');
-  const expected = { 'Vue conceptuelle': 'Affichage', 'Éléments affichés': 'Affichage', 'Tout afficher': 'Affichage', 'Masquer l’éditeur': 'Affichage',
-    'Réorganiser': 'Disposition', 'Tout replier': 'Disposition', 'Verrouiller les positions': 'Disposition' };
-  for (const [label, group] of Object.entries(expected)) {
-    await page.fill('#palInput', label);
-    const row = page.locator('#palList li').first();
-    await expect(row, label).toContainText(label);
-    await expect(row, label).toContainText(group);
-    await expect(row, label).not.toHaveClass(/off/);
-  }
-  await page.fill('#palInput', 'verrouiller');
-  await page.keyboard.press('Enter');
-  await expect(page.locator('#lockPanel')).toBeVisible();
-  await page.keyboard.press('Control+k');
-  await page.fill('#palInput', 'masquer l');
-  await page.keyboard.press('Enter');
-  await expect(page.locator('#editorPane')).toBeHidden();
-  await page.keyboard.press('Control+k');
-  await page.fill('#palInput', 'afficher l');
-  await expect(page.locator('#palList li').first()).toContainText('Afficher l’éditeur');
-  await page.keyboard.press('Enter');
-  await expect(page.locator('#editorPane')).toBeVisible();
-});
-
-test('palette hides Vue conceptuelle for flow schemas and greys out Tout replier in conceptual view', async ({ page }) => {
-  await page.click('#btnConcept');
-  await page.keyboard.press('Control+k');
-  await page.fill('#palInput', 'replier');
-  await expect(page.locator('#palList li').first()).toHaveClass(/off/);
-  await page.keyboard.press('Escape');
-  await menu(page, '#btnFile', 'button.mi[data-ex="flow"]');
-  if (await page.locator('#exOk').isVisible()) await page.click('#exOk');
-  await page.keyboard.press('Control+k');
-  await page.fill('#palInput', 'conceptuelle');
-  await expect(page.locator('#palList')).toContainText('Aucune commande');
-});
-
-test('palette search ignores accents and word order', async ({ page }) => {
-  await page.keyboard.press('Control+k');
-  await page.keyboard.type('cinematique nouveau');
-  const rows = page.locator('#palList li');
-  await expect(rows.first()).toContainText('Nouveau schéma de cinématique');
-  await page.fill('#palInput', 'zzzz');
-  await expect(page.locator('#palList')).toContainText('Aucune commande');
-});
-
-test('palette: arrows move, disabled commands are dimmed and not runnable', async ({ page }) => {
-  await page.keyboard.press('Control+k');
-  await page.keyboard.type('supprimer');
-  const row = page.locator('#palList li').first();
-  await expect(row).toHaveClass(/off/);
-  await row.click({ force: true });
-  await expect(page.locator('#palette')).toBeVisible();
-  await page.fill('#palInput', '');
-  await page.keyboard.press('ArrowDown');
-  await expect(page.locator('#palList li.sel')).toHaveAttribute('data-i', '1');
-});
-
-test('palette can load an example, with confirmation when the editor was modified', async ({ page }) => {
-  await page.keyboard.press('Control+k');
-  await page.keyboard.type('boutique');
-  await page.keyboard.press('Enter');
+test('loading an example asks for confirmation when the editor was modified', async ({ page }) => {
+  await menu(page, '#btnFile', 'button.mi[data-ex="shop"]');
   await expect(page.locator('#status')).toHaveClass(/ok/);
   await expect(nodes(page).filter({ hasText: 'order_items' }).first()).toBeAttached();
   // modify the code: the example now requires a confirmation
   await page.fill('#src', 'Table zzz {\n  id integer\n}\n');
-  await page.keyboard.press('Control+k');
-  await page.keyboard.type('cinematique assurance');
-  await page.keyboard.press('Enter');
+  await menu(page, '#btnFile', 'button.mi[data-ex="flow"]');
   await expect(page.locator('#exConfirm')).toBeVisible();
   await page.click('#exOk');
   await expect(page.locator('#src')).toHaveValue(/dwh\.fait_sinistre/);
@@ -244,7 +156,7 @@ test('help dialog opens from Aide and lists shortcuts; syntax link opens docs in
   const dlg = page.locator('#helpModal');
   await expect(dlg).toBeVisible();
   await expect(dlg).toContainText('Maj + glisser');
-  await expect(dlg).toContainText('Palette de commandes');
+  await expect(dlg).toContainText('Rechercher / remplacer dans le code');
   await page.keyboard.press('Escape');
   await expect(dlg).toBeHidden();
   const a = page.locator('#lnkSyntax');

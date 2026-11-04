@@ -5,7 +5,7 @@
 - **Deux types de fichier**, choisis à la création : schéma de **cinématique de données** (flux seuls) ou **modèle objets relations** (relations seules) — voir « Types de schéma »
 - Édition avec coloration syntaxique, erreurs localisées à la ligne près
 - Autocomplétion contextuelle : tables et colonnes dans les relations et les mappings, types, paramètres entre crochets, squelettes de blocs, paires automatiques
-- **Une barre de menus** (Fichier, Édition, Exporter, Aide), une **barre de boutons sur le canvas** (zoom, affichage, disposition : un seul clic) et une **palette de commandes** (Ctrl/⌘ K) pour tout retrouver au clavier
+- **Une barre de menus** (Fichier, Édition, Exporter, Aide), une **barre de boutons sur le canvas** (zoom, affichage, disposition : un seul clic)
 - Rechercher / remplacer dans l'éditeur (Ctrl/⌘ F), éditeur repliable (Ctrl/⌘ B) et redimensionnable (largeur mémorisée)
 - Descriptions des champs et des tables (`note` DBML standard) affichées en infobulle au survol
 - Diagramme interactif : déplacement, zoom, layout automatique, repli des tables, verrouillage de position, défilement automatique en glissant vers le bord
@@ -110,7 +110,7 @@ Les fichiers, l'édition, les exports et l'aide passent par la barre de menus en
 | Fichier | Nouveaux schémas, Ouvrir (Ctrl/⌘ O), Enregistrer (Ctrl/⌘ S), Enregistrer sous (Ctrl/⌘ ⇧ S), Exemples |
 | Édition | Rechercher / remplacer (Ctrl/⌘ F), Copier le DBML, Copier en DBML standard (sans les blocs `Mapping`, pour dbdiagram.io et `@dbml/core`), Supprimer la sélection (Suppr), Changer le type de schéma |
 | Exporter | Image du schéma, Script SQL PostgreSQL |
-| Aide | Palette de commandes (Ctrl/⌘ K), Raccourcis et gestes, lien vers la syntaxe DBML |
+| Aide | Raccourcis et gestes, lien vers la syntaxe DBML |
 
 **Barre du canvas** (en bas à droite du diagramme, une seule étape de clic ; elle passe sur plusieurs lignes quand la largeur manque). Chaque bouton a une infobulle en français ; les bascules (Vue conceptuelle, Éditeur) et les panneaux ouverts (Éléments affichés, Verrouiller) sont mis en évidence quand ils sont actifs :
 
@@ -119,8 +119,6 @@ Les fichiers, l'édition, les exports et l'aide passent par la barre de menus en
 | Zoom | − / pourcentage / + |
 | Affichage | Vue conceptuelle (bascule, absente pour une cinématique), Éléments affichés (panneau), Tout afficher, Éditeur (masquer / afficher l'éditeur, Ctrl/⌘ B) |
 | Disposition | Réorganiser, Tout replier / Tout déplier, Verrouiller (panneau « Verrouiller les positions ») |
-
-**Palette de commandes** (Ctrl/⌘ K, y compris depuis l'éditeur) : liste toutes les commandes des menus et de la barre du canvas (groupes « Affichage » et « Disposition »), filtrées en tapant (sans tenir compte des accents ni de l'ordre des mots). Flèches pour choisir, Entrée pour exécuter, Échap pour fermer. Une commande indisponible est grisée. Charger un exemple repasse par la confirmation du menu Fichier si le code a été modifié.
 
 - Dans Chrome et Edge, l'API File System Access écrit directement dans le fichier ouvert : Enregistrer met à jour le même fichier, sans nouvelle boîte de dialogue.
 - Dans Firefox et Safari, qui n'ont pas cette API, Enregistrer télécharge une copie `.dbml`.
@@ -159,7 +157,7 @@ Un point à droite du nom signale un champ décrit. Le survol d'un champ affiche
 
 **Clic pour retrouver le code** : cliquer une table, un champ, une valeur d'enum ou une région place le curseur sur la ligne source correspondante dans l'éditeur (comme le double-clic, dès le premier clic).
 
-**Verrouillage** : le bouton « Verrouiller » de la barre du canvas (ou la commande « Verrouiller les positions… » de la palette) ouvre un panneau classé par type (Régions, Tables, Énumérations), chaque section avec sa case « Toutes », plus une case « Tout verrouiller » en tête pour l'ensemble. Un élément verrouillé (glyphe cadenas) ne peut plus être déplacé, mais reste cliquable pour la sélection et le focus éditeur. Cliquer-glisser sur un élément verrouillé fait défiler la vue (comme sur le fond du canvas) au lieu de ne rien faire. Verrouiller une région verrouille aussi ses membres, repliée ou non.
+**Verrouillage** : le bouton « Verrouiller » de la barre du canvas ouvre un panneau classé par type (Régions, Tables, Énumérations), chaque section avec sa case « Toutes », plus une case « Tout verrouiller » en tête pour l'ensemble. Un élément verrouillé (glyphe cadenas) ne peut plus être déplacé, mais reste cliquable pour la sélection et le focus éditeur. Cliquer-glisser sur un élément verrouillé fait défiler la vue (comme sur le fond du canvas) au lieu de ne rien faire. Verrouiller une région verrouille aussi ses membres, repliée ou non.
 
 **Aide et survol** : le menu Aide > « Raccourcis et gestes… » liste les raccourcis clavier et les gestes de la souris. Survoler une table (souris seulement) met ses relations en évidence et atténue le reste, en vue détaillée comme en vue conceptuelle. L'éditeur a un en-tête « Code DBML » avec le bouton « Masquer ».
 
