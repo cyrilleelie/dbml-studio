@@ -11,7 +11,7 @@
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --paper:#e9eef1; --grid:#d3dce2; --ink:#1c3550; --head:#1c3550; --ink-2:#31516f; --muted:#667a8b;
   --node:#ffffff; --node-line:#b9c7d2; --row-alt:#f5f8fa; --signal:#e39a2d; --signal-soft:rgba(227,154,45,.18);
-  --edge:#7890a4; --bar:#f7f9fa; --bar-line:#d6dee4; --btn:#ffffff; --btn-hover:#eef3f6; --danger:#c2410c;
+  --edge:#4a6580; --type:#475f76; --bar:#f7f9fa; --bar-line:#d6dee4; --btn:#ffffff; --btn-hover:#eef3f6; --danger:#c2410c;
   --ok:#2f7d5b; --group:rgba(28,53,80,.045); --group-line:rgba(28,53,80,.28);
   --code-bg:#14202b; --code-text:#d5dee6; --code-gutter:#5d7183; --code-line:#1b2a37; --code-err:rgba(194,65,12,.28);
   --hl-kw:#f0a868; --hl-str:#9fd49a; --hl-com:#5f7385; --hl-set:#8cc4f2; --hl-op:#f2cf6b; --hl-num:#d3a6f5; --hl-qid:#7fd8d0;
@@ -22,7 +22,7 @@
   :root:not([data-theme="light"]){
     --paper:#0f1821; --grid:#1a2733; --ink:#8fb0cf; --head:#2b4a69; --ink-2:#6f93b5; --muted:#7d91a3;
     --node:#15212c; --node-line:#2a3b4b; --row-alt:#182532; --signal:#f0a93f; --signal-soft:rgba(240,169,63,.2);
-    --edge:#58728a; --bar:#121c26; --bar-line:#223241; --btn:#172430; --btn-hover:#1e2f3d; --danger:#f97c4a;
+    --edge:#86a3be; --type:#a3b8ca; --bar:#121c26; --bar-line:#223241; --btn:#172430; --btn-hover:#1e2f3d; --danger:#f97c4a;
     --ok:#5fbf92; --group:rgba(143,176,207,.05); --group-line:rgba(143,176,207,.3);
     --code-bg:#0b131a; --code-line:#132029;
     --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.25);
@@ -31,7 +31,7 @@
 :root[data-theme="dark"]{
   --paper:#0f1821; --grid:#1a2733; --ink:#8fb0cf; --head:#2b4a69; --ink-2:#6f93b5; --muted:#7d91a3;
   --node:#15212c; --node-line:#2a3b4b; --row-alt:#182532; --signal:#f0a93f; --signal-soft:rgba(240,169,63,.2);
-  --edge:#58728a; --bar:#121c26; --bar-line:#223241; --btn:#172430; --btn-hover:#1e2f3d; --danger:#f97c4a;
+  --edge:#86a3be; --type:#a3b8ca; --bar:#121c26; --bar-line:#223241; --btn:#172430; --btn-hover:#1e2f3d; --danger:#f97c4a;
   --ok:#5fbf92; --group:rgba(143,176,207,.05); --group-line:rgba(143,176,207,.3);
   --code-bg:#0b131a; --code-line:#132029;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 18px rgba(0,0,0,.25);
@@ -53,8 +53,11 @@ button{font:inherit;color:inherit}
 .btn.warn{border-color:var(--danger);color:var(--danger)}
 
 .split{flex:1;display:flex;min-height:0}
+.ed-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px 5px 14px;border-bottom:1px solid var(--code-line);background:var(--code-bg)}
+.ed-title{font:600 12px var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--code-gutter)}
+.ed-head .btn{padding:3px 8px;font-size:12px}
 .editor-pane{flex:0 0 38%;min-width:240px;display:flex;flex-direction:column;background:var(--code-bg);min-height:0;position:relative}
-.findbar{position:absolute;z-index:6;top:6px;left:6px;right:110px;display:flex;align-items:center;gap:5px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;padding:5px 6px;box-shadow:var(--shadow);flex-wrap:wrap}
+.findbar{position:absolute;z-index:6;top:42px;left:6px;right:6px;display:flex;align-items:center;gap:5px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;padding:5px 6px;box-shadow:var(--shadow);flex-wrap:wrap}
 .findbar[hidden]{display:none}
 .findbar input{background:var(--btn);color:var(--ink);border:1px solid var(--bar-line);border-radius:5px;padding:4px 7px;font:12.5px var(--mono);width:120px;min-width:0}
 .findbar input:focus-visible{outline:2px solid var(--signal);outline-offset:-1px}
@@ -65,7 +68,6 @@ button{font:inherit;color:inherit}
 #btnConcept[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
 .fb-count{font-size:11.5px;color:var(--muted);min-width:38px;text-align:center}
 .fb-count.none{color:var(--danger)}
-@media (max-width:520px){.findbar{right:6px}}
 .find-hl{position:absolute;background:var(--signal-soft);outline:1.5px solid var(--signal);border-radius:2px;pointer-events:none}
 .find-hl[hidden]{display:none}
 .tip.colorpop{display:flex;flex-direction:column;gap:8px;pointer-events:auto}
@@ -115,7 +117,9 @@ button{font:inherit;color:inherit}
 .toolbar .btn:hover{background:var(--btn-hover)}
 .zoom{min-width:48px;text-align:center;font-size:12.5px;color:var(--muted);align-self:center;font-variant-numeric:tabular-nums}
 .sep{width:1px;background:var(--bar-line);margin:3px 2px}
-.hint{position:absolute;left:12px;bottom:14px;max-width:calc(100% - 400px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--muted);pointer-events:none}
+.help-btn{position:absolute;left:12px;top:12px;width:30px;height:30px;padding:0;border-radius:50%;font-weight:600;background:var(--bar);box-shadow:var(--shadow)}
+.help-pop{left:12px;top:50px;max-width:min(300px,calc(100% - 24px));padding:10px 12px;line-height:1.5;color:var(--ink-2)}
+.help-pop[hidden]{display:none}
 .empty[hidden]{display:none}
 .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;pointer-events:none;text-align:center;padding:24px}
 
@@ -125,7 +129,7 @@ button{font:inherit;color:inherit}
 .node .title{fill:#fff;font:600 13px var(--sans)}
 .node .cname{fill:var(--ink);font:500 12.5px var(--mono)}
 .node .cname.pk{font-weight:600}
-.node .ctype{fill:var(--muted);font:12px var(--mono)}
+.node .ctype{fill:var(--type);font:12px var(--mono)}
 .node .alt{fill:var(--row-alt)}
 .node .rowline{stroke:var(--node-line);stroke-width:.5;opacity:.6}
 .node .key{fill:none;stroke:var(--signal);stroke-width:1.4}
@@ -137,15 +141,21 @@ button{font:inherit;color:inherit}
 .node.sel .body{stroke:var(--signal);stroke-width:2}
 .node .hotrow{fill:var(--signal-soft)}
 .dim{opacity:.28}
-.edge .line{fill:none;stroke:var(--edge);stroke-width:1.5}
-.edge .mk{fill:none;stroke:var(--edge);stroke-width:1.5}
+.edge .line{fill:none;stroke:var(--edge);stroke-width:1.9}
+.edge .mk{fill:none;stroke:var(--edge);stroke-width:1.9}
 .edge .hit{fill:none;stroke:transparent;stroke-width:12}
-.edge.enumref .line{stroke-dasharray:3 4;stroke-width:1.2}
+.edge.enumref .line{stroke-dasharray:3 4;stroke-width:1.5}
 .edge:hover .line,.edge:hover .mk,.edge.hot .line,.edge.hot .mk{stroke:var(--signal);stroke-width:2.2}
+.edge.hl .line,.edge.hl .mk{stroke:var(--signal);stroke-width:2.6}
+.edge.refgrouped.hl .line,.edge.refgrouped.hl .mk{stroke:var(--fc)}
+.edge.flow.hl .line{stroke:var(--fc);stroke-width:3}
+.edge.faded{opacity:.14}.node.faded{opacity:.5}
+.edge,.node{transition:opacity .12s}
 #world.nocard .edge .card{display:none}
 #world.concept .cscale{transform-box:fill-box;transform-origin:center;transform:scale(var(--f,1))}
-#world.concept .edge .line{stroke-width:calc(1.5px * var(--f,1))}
+#world.concept .edge .line{stroke-width:calc(1.9px * var(--f,1))}
 #world.concept .edge:hover .line,#world.concept .edge.hot .line{stroke-width:calc(2.2px * var(--f,1))}
+#world.concept .edge.hl .line{stroke-width:calc(2.6px * var(--f,1))}
 .node.cpt .title{font-size:14.5px}
 .node.cpt.dom-in .body{fill:var(--node);stroke:#3b6ea8;stroke-width:2.4}
 .node.cpt.dom-in .title{fill:var(--ink)}
@@ -173,7 +183,7 @@ button{font:inherit;color:inherit}
 .node.enum .chev{stroke:var(--ink)}
 .ccount{fill:#fff;opacity:.72;font:500 11px var(--sans);pointer-events:none}
 .node.enum .ccount{fill:var(--muted);opacity:1}
-.group text{fill:var(--ink-2);font:600 12.5px var(--sans)}
+.group text{fill:var(--ink-2);font:600 16px var(--sans)}
 
 /* Flux de données */
 .edge.flow .line{stroke:var(--fc);stroke-width:1.6;stroke-dasharray:7 5;animation:flowdash 1.1s linear infinite}
@@ -187,8 +197,8 @@ button{font:inherit;color:inherit}
 @keyframes flowdash{to{stroke-dashoffset:-12}}
 .node .hotrow.start{fill:var(--signal);opacity:.35}
 .overlay{position:absolute;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;box-shadow:var(--shadow);font-size:12.5px}
-.sidepanel{right:12px;bottom:56px;padding:6px;min-width:230px;max-width:min(300px,calc(100% - 24px));max-height:min(420px,calc(100% - 80px));display:flex;flex-direction:column}
-.sidepanel .fp-body{overflow-y:auto}
+.sidepanel{right:12px;bottom:56px;padding:6px;min-width:230px;max-width:min(300px,calc(100% - 24px));max-height:min(420px,calc(100% - 80px));display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
+.sidepanel .fp-body{overflow-y:auto;min-height:0}
 .fp-title{display:flex;align-items:center;justify-content:space-between;width:100%;border:0;background:none;padding:4px 6px;font-weight:600;cursor:pointer;font-size:12.5px}
 .fp-title::after{content:"▾";color:var(--muted);font-size:11px}
 .flows.closed .fp-title::after{content:"▸"}
@@ -310,7 +320,6 @@ button{font:inherit;color:inherit}
   .split{flex-direction:column}
   .editor-pane{flex:0 0 42% !important;min-width:0}
   .splitter{display:none}
-  .hint{display:none}
   .stats{order:3;flex-basis:100%}
 }
 @media (prefers-reduced-motion: reduce){*{transition:none !important}.edge.flow .line{animation:none}}
@@ -365,7 +374,7 @@ button{font:inherit;color:inherit}
   </header>
   <main class="split">
     <section class="editor-pane" id="editorPane" aria-label="Éditeur DBML">
-      <button class="btn" id="btnCollapseEditor" style="position:absolute;z-index:5;right:6px;top:6px;padding:3px 8px;font-size:12px" title="Masquer l’éditeur (Ctrl/⌘ B)">Masquer</button>
+      <div class="ed-head" id="editorHead"><span class="ed-title">Code DBML</span><button class="btn" id="btnCollapseEditor" title="Masquer l’éditeur (Ctrl/⌘ B)">Masquer</button></div>
       <div class="findbar" id="findBar" hidden role="search">
         <input type="text" id="findInput" placeholder="Rechercher" aria-label="Rechercher">
         <button class="fb-icon" id="findCase" title="Respecter la casse" aria-pressed="false">Aa</button>
@@ -395,7 +404,8 @@ button{font:inherit;color:inherit}
         <g id="world"><g id="lanesLayer"></g><g id="groupsLayer"></g><g id="edgesLayer"></g><g id="nodesLayer"></g></g>
       </svg>
       <div class="empty" id="empty" hidden>Écris une première table à gauche, par exemple :<br><br>Table users {<br>&nbsp;&nbsp;id integer [pk]<br>}</div>
-      <div class="hint">Glisse les tables ou les régions · Maj+glisser pour sélectionner plusieurs éléments · double-clic pour aller au code</div>
+      <button class="btn help-btn" id="btnHelp" aria-haspopup="true" aria-expanded="false" aria-controls="helpPop" title="Aide : manipuler le diagramme" aria-label="Aide">?</button>
+      <div class="overlay help-pop" id="helpPop" role="note" hidden>Glisse les tables ou les régions · Maj+glisser pour sélectionner plusieurs éléments · double-clic pour aller au code · survole une table pour mettre ses relations en évidence</div>
       <div class="marquee" id="marquee" hidden></div>
       <div class="overlay sidepanel" id="displayPanel" hidden></div>
       <div class="overlay sidepanel" id="lockPanel" hidden></div>
@@ -525,7 +535,7 @@ let pos = {}, inactivePos = {};
 const LS_POSC = 'dbml-studio:pos-concept', LS_CONCEPT = 'dbml-studio:concept';
 // Vue conceptuelle : tables seules (noms), relations et cardinalités ; elle a sa propre disposition.
 // « pos » désigne toujours la disposition active, « inactivePos » celle de l'autre vue.
-let conceptual = store.get(LS_CONCEPT) === '1', exporting = false;
+let conceptual = store.get(LS_CONCEPT) === '1';
 // Type de schéma : « flow » (cinématique de données : flux seuls) ou « model » (modèle objets relations : relations seules)
 const LS_TYPE = 'dbml-studio:type';
 const TYPE_LABEL = { flow: 'Cinématique de données', model: 'Modèle objets relations' };
@@ -535,6 +545,7 @@ try { pos = JSON.parse(store.get(LS_POS) || '{}') || {}; } catch (e) { pos = {};
 try { inactivePos = JSON.parse(store.get(LS_POSC) || '{}') || {}; } catch (e) { inactivePos = {}; }
 if (conceptual) [pos, inactivePos] = [inactivePos, pos];
 let view = { x: 40, y: 40, k: 1 };
+let hoverId = null;
 let selected = null;
 let firstBuild = true;
 let collapsed = new Set();
@@ -914,6 +925,7 @@ const mctx = document.createElement('canvas').getContext('2d');
 // mêmes piles de polices que le CSS (--sans / --mono) : les largeurs mesurées correspondent au rendu
 const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const F_HEAD = '600 13px ' + cssVar('--sans');
+const F_GROUP = '600 16px ' + cssVar('--sans');
 const F_NAME = '600 12.5px ' + cssVar('--mono');
 const F_TYPE = '12px ' + cssVar('--mono');
 const tw = (t, f) => { mctx.font = f; return mctx.measureText(t).width; };
@@ -1438,7 +1450,7 @@ function colorSwatch(kind, id, cx, cy, hex) {
 // Lisibilité au dézoom en vue conceptuelle : entités, symboles de cardinalité et traits sont grossis
 // d'un facteur (1/k)^CONCEPT_EXP quand k < 1, de sorte qu'ils rétrécissent moins vite que l'espacement.
 const CONCEPT_EXP = 0.5, CONCEPT_CARD_MIN_K = 0.25; // sous ce zoom, les chiffres de cardinalité sont masqués
-function conceptScale() { return (conceptual && !exporting && view.k < 1) ? Math.pow(1 / view.k, CONCEPT_EXP) : 1; }
+function conceptScale() { return (conceptual && view.k < 1) ? Math.pow(1 / view.k, CONCEPT_EXP) : 1; }
 function conceptNodeSVG(n) {
   const color = n.color && /^#[0-9a-f]{3,8}$/i.test(n.color) ? n.color : 'var(--head)';
   const isG = n.kind === 'group', nLocked = isG ? locked.has(n.id) : isLockedNode(n);
@@ -1523,7 +1535,7 @@ function edgeSVG(e) {
   if (e.kind === 'flow') cls += ' flow';
   if (e.kind === 'ref' && e.color) cls += ' refgrouped';
   if (focus) cls += focus.edges.has(e) ? ' hot' : ' dim';
-  let s = `<g class="${cls}"${(e.kind === 'flow' || (e.kind === 'ref' && e.color)) ? ` style="--fc:${e.color}"` : ''}><title>${esc(e.label)}${e.n > 1 ? '\n(' + e.n + ' relations regroupées)' : ''}</title><path class="hit" d="${d}"/><path class="line" d="${d}"/>`;
+  let s = `<g class="${cls}" data-a="${esc(e.a)}" data-b="${esc(e.b)}"${(e.kind === 'flow' || (e.kind === 'ref' && e.color)) ? ` style="--fc:${e.color}"` : ''}><title>${esc(e.label)}${e.n > 1 ? '\n(' + e.n + ' relations regroupées)' : ''}</title><path class="hit" d="${d}"/><path class="line" d="${d}"/>`;
   if (e.kind === 'ref') {
     const manyA = e.op === '>' || e.op === '<>', manyB = e.op === '<' || e.op === '<>';
     if (conceptual) {
@@ -1612,10 +1624,10 @@ function groupsSVG() {
     const bs = g.color ? ` style="fill:${hexA(g.color, .08)};stroke:${hexA(g.color, .6)}"` : '';
     const ts = g.color ? ` style="fill:${g.color}"` : '';
     s += `<g class="${cls}" data-gid="${esc(g.id)}"><rect class="gbox" x="${x1}" y="${y1}" width="${x2 - x1}" height="${y2 - y1}" rx="12"${bs}/>`;
-    s += `<text x="${x1 + 14}" y="${y1 + 22}"${ts}><title>Glisser pour déplacer toute la région</title>${esc(g.name)}</text>`;
-    let gx = x1 + 14 + tw(g.name, F_HEAD) + 16;
-    s += colorSwatch('group', g.id, gx, y1 + 18, safeColor(g.color)); gx += 16;
-    if (gLocked) { s += lockGlyph(gx, y1 + 18); }
+    s += `<text x="${x1 + 14}" y="${y1 + 24}"${ts}><title>Glisser pour déplacer toute la région</title>${esc(g.name)}</text>`;
+    let gx = x1 + 14 + tw(g.name, F_GROUP) + 16;
+    s += colorSwatch('group', g.id, gx, y1 + 20, safeColor(g.color)); gx += 16;
+    if (gLocked) { s += lockGlyph(gx, y1 + 20); }
     s += `<rect class="gchev-hit" data-gid="${esc(g.id)}" x="${x2 - 36}" y="${y1 + 6}" width="28" height="24" rx="5"><title>Replier la région</title></rect>`;
     s += `<path class="chev" transform="translate(${x2 - 22},${y1 + 18})" d="M-4.5,-2 L0,2.5 L4.5,-2"${g.color ? ` style="stroke:${g.color}"` : ''}/></g>`;
   }
@@ -1685,8 +1697,31 @@ function renderNodes() {
     if (multiSel.has(n.id)) s = s.replace('class="node ', 'class="node msel ');
     return s;
   }).join('');
+  applyHover();
 }
-function renderEdges() { edgesLayer.innerHTML = vedges.map(edgeSVG).join(''); }
+function renderEdges() { edgesLayer.innerHTML = vedges.map(edgeSVG).join(''); applyHover(); }
+// Survol : les relations de la table survolée sont mises en évidence, le reste est atténué (classes hl / faded, sans re-rendu)
+function applyHover() {
+  const on = !!hoverId;
+  edgesLayer.querySelectorAll('.edge').forEach(el => {
+    const rel = on && (el.dataset.a === hoverId || el.dataset.b === hoverId);
+    el.classList.toggle('hl', rel); el.classList.toggle('faded', on && !rel);
+  });
+  const near = new Set([hoverId]);
+  if (on) edgesLayer.querySelectorAll('.edge.hl').forEach(el => { near.add(el.dataset.a); near.add(el.dataset.b); });
+  nodesLayer.querySelectorAll('.node').forEach(el => el.classList.toggle('faded', on && !near.has(el.dataset.id)));
+}
+function setHover(id) { if (id === hoverId) return; hoverId = id; applyHover(); }
+svg.addEventListener('pointerover', e => {
+  if (e.pointerType && e.pointerType !== 'mouse') return;
+  const g = e.target.closest && e.target.closest('.node');
+  setHover(g ? g.dataset.id : null);
+});
+svg.addEventListener('pointerleave', () => setHover(null));
+$('btnHelp').onclick = () => { const h = $('helpPop').hidden; $('helpPop').hidden = !h; $('btnHelp').setAttribute('aria-expanded', String(h)); };
+document.addEventListener('click', e => {
+  if (!$('helpPop').hidden && !e.target.closest('#helpPop, #btnHelp')) { $('helpPop').hidden = true; $('btnHelp').setAttribute('aria-expanded', 'false'); }
+});
 function lanesSVG() {
   if (!showLanes || !laneGeo.length || !nodes.length) return '';
   const PAD = 70;
@@ -1918,7 +1953,7 @@ function renderDisplayPanel() {
   const isFlow = schemaType === 'flow';
   const allShown = allItems.length > 0 && allItems.every(it => !hiddenEls.has(it.id)) && (isFlow || (showFK && allRefGroupsShown)) && (!isFlow || allMapsShown);
   let h = `<button class="fp-title" id="dpToggle" aria-expanded="${!dp.classList.contains('closed')}">Affichage</button><div class="fp-body">`;
-  h += `<label class="fp-row"><input type="checkbox" id="showAllEls"${allShown ? ' checked' : ''}><span class="fp-name"><b>Tout afficher</b></span></label><div class="fp-sep"></div>`;
+  h += `<label class="fp-row"><input type="checkbox" id="showAllEls"${allShown ? ' checked' : ''}><span class="fp-name"><b>Tout cocher</b></span></label><div class="fp-sep"></div>`;
   if (!isFlow) {
   h += `<div class="fp-group-title">Relations</div>`;
   h += `<label class="fp-row fp-sub"><input type="checkbox" data-fk="1"${showFK ? ' checked' : ''}><span class="fp-name">Toutes</span></label>`;
@@ -3043,24 +3078,36 @@ function currentTheme() {
   if (t === 'light' || t === 'dark') return t;
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
-// Construit un SVG autonome : styles du diagramme recopiés avec les couleurs résolues du thème choisi
+// Boîte de l'export = ce que montre le canvas au zoom courant (entités agrandies en vue conceptuelle comprises), plus une marge
+const EXPORT_PAD = 32;
+function exportBox() {
+  const bb = world.getBBox();
+  return { bb, W: Math.ceil(bb.width + EXPORT_PAD * 2), H: Math.ceil(bb.height + EXPORT_PAD * 2) };
+}
+// Construit un SVG autonome : le canvas tel qu'il est affiché (mêmes éléments, même rendu, facteur d'agrandissement
+// de la vue conceptuelle compris), styles recopiés avec les couleurs résolues du thème choisi.
+// Seuls les états d'interaction (sélection, survol, lignage, poignées) en sont exclus.
 function buildExportSVG({ theme, background }) {
-  const saved = { selected, trace };
-  selected = null; trace = null;
-  exporting = true; world.classList.remove('concept'); // l'export garde la disposition à 100 %
-  renderAll();
+  const saved = { selected, trace, hoverId };
+  selected = null; trace = null; hoverId = null; renderAll();
   const root = document.documentElement, prevTheme = root.getAttribute('data-theme');
   root.setAttribute('data-theme', theme);
   try {
     const cs = getComputedStyle(root);
-    const resolve = txt => txt.replace(/var\(--([\w-]+)\)/g, (m, n) => cs.getPropertyValue('--' + n).trim() || m);
-    const keep = /^\.(node|edge|group|gnode|ccount)\b/;
+    const f = conceptScale(); // facteur d'agrandissement courant (1 hors vue conceptuelle ou à zoom >= 100 %)
+    // --f est remplacé par sa valeur, et les calc(Npx * f) sont évalués : le SVG ne dépend d'aucune variable CSS
+    const resolve = txt => txt
+      .replace(/var\(--f,\s*1\)/g, String(+f.toFixed(4)))
+      .replace(/calc\(([\d.]+)px \* ([\d.]+)\)/g, (m, a, b) => +(a * b).toFixed(3) + 'px')
+      .replace(/var\(--([\w-]+)\)/g, (m, n) => cs.getPropertyValue('--' + n).trim() || m);
+    // les règles propres à la vue conceptuelle (#world.concept …) s'appliquent au clone, qui garde l'id et les classes de #world
+    const keep = /^(#world(\.[\w-]+)*\s+)?\.(node|edge|group|gnode|ccount|lane-band|lock-glyph)\b/;
     const css = [];
     for (const sh of document.styleSheets) {
       let rules; try { rules = sh.cssRules; } catch (e) { continue; }
       for (const r of rules) {
         if (!(r instanceof CSSStyleRule)) continue;
-        const parts = r.selectorText.split(',').map(x => x.trim()).filter(x => keep.test(x) && !x.includes(':') && !/\.(hot|sel|dim)\b/.test(x));
+        const parts = r.selectorText.split(',').map(x => x.trim()).filter(x => keep.test(x) && !x.includes(':') && !/\.(hot|sel|dim|faded|hl)\b/.test(x));
         if (!parts.length) continue;
         const decls = [];
         for (let i = 0; i < r.style.length; i++) {
@@ -3074,12 +3121,26 @@ function buildExportSVG({ theme, background }) {
         if (decls.length) css.push(`${parts.join(',')}{${decls.join(';')}}`);
       }
     }
-    const bb = world.getBBox();
-    const pad = 32;
-    const W = Math.ceil(bb.width + pad * 2), H = Math.ceil(bb.height + pad * 2);
+    const { bb, W, H } = exportBox();
     const clone = world.cloneNode(true);
-    clone.setAttribute('transform', `translate(${pad - bb.x},${pad - bb.y})`);
-    clone.querySelectorAll('.chev-hit,.gchev-hit,.hit,.chev,title').forEach(el => el.remove());
+    clone.removeAttribute('style');
+    clone.setAttribute('transform', `translate(${EXPORT_PAD - bb.x},${EXPORT_PAD - bb.y})`);
+    // agrandissement des entités (vue conceptuelle) : transformation explicite autour du centre de chaque entité
+    if (f !== 1) {
+      const live = world.querySelectorAll('.cscale');
+      clone.querySelectorAll('.cscale').forEach((el, i) => {
+        const b = live[i].getBBox(), cx = b.x + b.width / 2, cy = b.y + b.height / 2;
+        el.setAttribute('transform', `translate(${cx},${cy}) scale(${+f.toFixed(4)}) translate(${-cx},${-cy})`);
+      });
+    }
+    // poignées et boutons d'interaction : invisibles ou sans objet hors du canvas
+    clone.querySelectorAll('.chev-hit,.gchev-hit,.hit,.chev,.swatch,title').forEach(el => el.remove());
+    // relations d'un groupe coloré : trait et symboles prennent la couleur --fc, comme sur le canvas
+    clone.querySelectorAll('.edge.refgrouped').forEach(g => {
+      const c = g.style.getPropertyValue('--fc').trim();
+      g.querySelectorAll('.line,.mk').forEach(el => { el.style.stroke = c; });
+      g.style.removeProperty('--fc');
+    });
     clone.querySelectorAll('.edge.flow').forEach(g => {
       const c = g.style.getPropertyValue('--fc').trim();
       // style en ligne : prioritaire sur les règles génériques .edge .line
@@ -3096,8 +3157,7 @@ function buildExportSVG({ theme, background }) {
     return { svg, W, H, paper };
   } finally {
     if (prevTheme === null) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', prevTheme);
-    exporting = false; lastConceptF = null; applyView(); renderAll();
-    selected = saved.selected; trace = saved.trace; renderAll();
+    selected = saved.selected; trace = saved.trace; hoverId = saved.hoverId; renderAll();
   }
 }
 async function rasterize(svg, W, H, scale, mime, fill) {
@@ -3120,8 +3180,7 @@ function refreshImgForm() {
   if (fmt === 'jpg' && none.checked) imgModal.querySelector('input[name="bg"][value="solid"]').checked = true;
   if (!nodes.length) { $('imgInfo').textContent = 'Le schéma est vide.'; $('imgGo').disabled = true; return; }
   $('imgGo').disabled = false;
-  exporting = true; renderAll(); const bb = world.getBBox(); exporting = false; renderAll();
-  const W = Math.ceil(bb.width + 64), H = Math.ceil(bb.height + 64);
+  const { W, H } = exportBox();
   if (fmt === 'svg') { $('imgInfo').textContent = `Image vectorielle de ${W} × ${H}, modifiable dans un logiciel de dessin.`; return; }
   const sc = Math.min(+formVal('scale'), MAX_SIDE / Math.max(W, H));
   $('imgInfo').textContent = `${Math.round(W * sc)} × ${Math.round(H * sc)} pixels.`;
@@ -3163,6 +3222,14 @@ if (!Object.keys(pos).length) firstBuild = true;
 applyView();
 parseNow();
 if (nodes.length) fit();
+// Accès en lecture/zoom pour les tests de bout en bout
+window.dbmlStudio = {
+  get zoom() { return view.k; },
+  setZoom(k, x = 40, y = 40) { view.k = k; view.x = x; view.y = y; applyView(); },
+  centerOn(id, k) { const n = nodeMap.get(id), r = svg.getBoundingClientRect(); view.k = k; view.x = r.width / 2 - (n.x + n.w / 2) * k; view.y = r.height / 2 - (n.y + n.h / 2) * k; applyView(); },
+  get edgeCount() { return vedges.length; },
+  relatedEdgeCount(id) { return vedges.filter(e => e.a === id || e.b === id).length; }
+};
 window.addEventListener('resize', () => { if (firstBuild) fit(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (db) { build(db); } });
 })();

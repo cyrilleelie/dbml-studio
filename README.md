@@ -108,7 +108,7 @@ Le point orange à côté du nom du fichier reflète aussi les positions et repl
 - Dans Firefox et Safari, qui n'ont pas cette API, Enregistrer télécharge une copie `.dbml`.
 - Le nom du fichier s'affiche à côté du titre ; un point orange signale des modifications non enregistrées dans un fichier. Le texte reste de toute façon sauvegardé dans le navigateur.
 
-**Exporter ▾ › Image du schéma** : PNG, JPG, WebP (résolution 1×, 2× ou 3×, plafonnée à 12 000 px de côté) ou SVG vectoriel ; thème clair ou sombre ; fond coloré ou transparent (sauf JPG). L'image contient tout le diagramme dans son état actuel (tables et régions repliées comprises), sans la sélection ni les boutons d'interface.
+**Exporter ▾ › Image du schéma** : PNG, JPG, WebP (résolution 1×, 2× ou 3×, plafonnée à 12 000 px de côté) ou SVG vectoriel ; thème clair ou sombre ; fond coloré ou transparent (sauf JPG). L'image contient tout le diagramme tel que le canvas l'affiche au zoom courant (tables et régions repliées, éléments masqués, bandes de colonnes, et en vue conceptuelle entités agrandies et cardinalités masquées comprises), sans la sélection, le survol ni les boutons d'interface.
 
 Les images raster utilisent les polices du système : un navigateur ne charge pas les polices web à l'intérieur d'une image SVG convertie. Le SVG garde la déclaration IBM Plex, appliquée si la police est installée.
 
@@ -141,6 +141,8 @@ Un point à droite du nom signale un champ décrit. Le survol d'un champ affiche
 
 **Verrouillage** : le bouton « Verrouiller » de la barre d'outils ouvre un panneau classé par type (Régions, Tables, Énumérations), chaque section avec sa case « Toutes », plus une case « Tout verrouiller » en tête pour l'ensemble. Un élément verrouillé (glyphe cadenas) ne peut plus être déplacé, mais reste cliquable pour la sélection et le focus éditeur. Cliquer-glisser sur un élément verrouillé fait défiler la vue (comme sur le fond du canvas) au lieu de ne rien faire. Verrouiller une région verrouille aussi ses membres, repliée ou non.
 
+**Aide et survol** : le bouton « ? » en haut à gauche du canvas ouvre un rappel des gestes (il se ferme d'un clic ailleurs). Survoler une table (souris seulement) met ses relations en évidence et atténue le reste, en vue détaillée comme en vue conceptuelle. L'éditeur a un en-tête « Code DBML » avec le bouton « Masquer ».
+
 **Défilement automatique** : glisser une table ou une région près du bord du canvas fait défiler la vue pour suivre le déplacement, sans à-coup au relâchement.
 
 **Sélection multiple** : Maj+glisser sur le fond du canvas dessine un cadre — tout ce qu'il touche est sélectionné (contour bleu). Maj+clic ajoute ou retire un élément de la sélection un par un. Glisser ensuite l'un des éléments sélectionnés déplace tout le groupe ; les éléments verrouillés de la sélection restent en place pendant que les autres suivent. Un clic simple ailleurs, ou Échap, efface la sélection.
@@ -152,7 +154,7 @@ Un point à droite du nom signale un champ décrit. Le survol d'un champ affiche
 - **Flux de données** : une case « Toutes », puis une ligne par `Mapping` avec sa couleur et son nombre de correspondances (section absente s'il n'y a aucun `Mapping`)
 - **Régions**, **Tables**, **Énumérations** : chaque élément individuellement, plus une case « Toutes » par catégorie
 
-Une case « Tout afficher » en tête agit sur l'ensemble. Décocher un élément le retire entièrement du diagramme, avec ses relations ; masquer une région masque aussi ses membres, repliée ou non. L'état est mémorisé. Ce panneau et celui du verrouillage se ferment mutuellement pour ne pas se superposer.
+Une case « Tout cocher » en tête agit sur l'ensemble. Le panneau défile sur un petit écran. Décocher un élément le retire entièrement du diagramme, avec ses relations ; masquer une région masque aussi ses membres, repliée ou non. L'état est mémorisé. Ce panneau et celui du verrouillage se ferment mutuellement pour ne pas se superposer.
 
 **Couleurs** : survoler l'en-tête d'une table ou le nom d'une région affiche une pastille cliquable, qui ouvre un sélecteur de couleur natif accompagné d'une palette des couleurs déjà utilisées dans le fichier et d'un bouton « Réinitialiser ». Le choix patche directement `headercolor:`/`color:` dans le texte source.
 
@@ -185,7 +187,7 @@ Réservée aux **modèles objets relations** (le bouton est absent d'un schéma 
 - **Disposition propre** : la vue conceptuelle a ses propres positions (calculées automatiquement au premier affichage, déplaçables ; « Réorganiser » les recalcule). Elles sont enregistrées dans le fichier avec celles de la vue détaillée, sans les modifier. Régions, verrouillage et masquage s'y appliquent comme d'habitude.
 - **Domaine fonctionnel** : le paramètre de table `[domain: in]` ou `[domain: out]` (aussi `domaine: interne | externe`) distingue les objets du domaine modélisé de ceux qui sont à l'extérieur mais reliés. Dès qu'une table le déclare, la vue conceptuelle affiche les tables du domaine avec un contour bleu et un fond blanc (c'est aussi le cas des tables sans paramètre), et les tables hors domaine avec un fond orange sans contour. Sans aucun paramètre `domain`, l'affichage reste inchangé. Le paramètre est retiré du DBML standard à la copie ; l'export image reprend ces styles.
 - **Au dézoom** : sous 100 %, entités, symboles et traits sont agrandis d'un facteur `(1/zoom)^0,5` (constante `CONCEPT_EXP` dans `src/index.html`) : ils rétrécissent moins vite que l'espacement, donc les noms restent lisibles bien plus longtemps. Sous 25 %, les chiffres de cardinalité sont masqués pour alléger. Très dézoomé, des entités voisines peuvent se toucher : c'est le prix de la lisibilité.
-- **Export d'image** : toujours produit à 100 %, comme dans la vue détaillée.
+- **Export d'image** : identique au canvas au zoom courant ; au dézoom, les entités sont agrandies du même facteur et rien n'est rogné. En vue détaillée, le rendu ne dépend pas du zoom.
 
 ## Extension `Mapping`
 
