@@ -3921,11 +3921,15 @@ button{font:inherit;color:inherit}
   background-size:24px 24px}
 #svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
 #svg.panning{cursor:grabbing}
-.toolbar{position:absolute;right:12px;bottom:12px;display:flex;gap:4px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;padding:4px;box-shadow:var(--shadow)}
+.toolbar{position:absolute;right:12px;bottom:12px;max-width:calc(100% - 24px);display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;background:var(--bar);border:1px solid var(--bar-line);border-radius:8px;padding:4px;box-shadow:var(--shadow)}
 .toolbar .btn{border-color:transparent;background:transparent;padding:4px 9px}
 .toolbar .btn:hover{background:var(--btn-hover)}
+.toolbar .btn[aria-pressed=true],.toolbar .btn[aria-expanded=true]{background:var(--btn-hover);border-color:var(--signal);color:var(--ink)}
+.toolbar .btn:disabled{opacity:.45;cursor:default}
+.tgroup{display:flex;gap:2px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .zoom{min-width:48px;text-align:center;font-size:12.5px;color:var(--muted);align-self:center;font-variant-numeric:tabular-nums}
 .sep{width:1px;background:var(--bar-line);margin:3px 2px}
+@media (max-width:1100px){.toolbar .sep{display:none}}
 .empty[hidden]{display:none}
 .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;pointer-events:none;text-align:center;padding:24px}
 
@@ -4199,24 +4203,6 @@ button{font:inherit;color:inherit}
         </div>
       </div>
       <div class="menu-wrap">
-        <button class="btn mb" id="btnView" data-menu="viewMenu" role="menuitem" aria-haspopup="true" aria-expanded="false">Affichage</button>
-        <div class="menu" id="viewMenu" role="menu" aria-label="Affichage" hidden>
-          <button class="mi" role="menuitemcheckbox" id="btnConcept" aria-checked="false" title="Tables et relations avec cardinalités, sans attributs ni flux">Vue conceptuelle<small>Cardinalités, sans attributs ni flux</small></button>
-          <button class="mi" role="menuitem" id="btnDisplayPanel" aria-haspopup="true" aria-expanded="false">Éléments affichés…</button>
-          <div class="msep" role="separator"></div>
-          <button class="mi" role="menuitem" id="btnFit">Tout afficher</button>
-          <button class="mi row" role="menuitem" id="btnToggleEditor">Masquer l’éditeur<kbd data-kbd="B"></kbd></button>
-        </div>
-      </div>
-      <div class="menu-wrap">
-        <button class="btn mb" id="btnDispo" data-menu="layoutMenu" role="menuitem" aria-haspopup="true" aria-expanded="false">Disposition</button>
-        <div class="menu" id="layoutMenu" role="menu" aria-label="Disposition" hidden>
-          <button class="mi" role="menuitem" id="btnLayout">Réorganiser<small>Recalcule la disposition automatique</small></button>
-          <button class="mi" role="menuitem" id="btnCollapseAll">Tout replier</button>
-          <button class="mi" role="menuitem" id="btnLockPanel" aria-haspopup="true" aria-expanded="false">Verrouiller les positions…</button>
-        </div>
-      </div>
-      <div class="menu-wrap">
         <button class="btn mb" id="btnExport" data-menu="exportMenu" role="menuitem" aria-haspopup="true" aria-expanded="false">Exporter</button>
         <div class="menu" id="exportMenu" role="menu" aria-label="Exporter" hidden>
           <button class="mi" role="menuitem" id="btnImage">Image du schéma…<small>PNG, JPG, WebP ou SVG</small></button>
@@ -4279,12 +4265,25 @@ button{font:inherit;color:inherit}
       </div>
       <div class="overlay trace" id="traceChip" hidden><span id="traceText"></span><button class="btn" id="traceClear">Effacer</button></div>
       <button class="reopen-editor" id="btnReopenEditor" hidden title="Afficher l’éditeur (Ctrl/⌘ B)">Éditeur</button>
-      <div class="toolbar">
-        <button class="btn" id="zOut" aria-label="Dézoomer">−</button>
-        <span class="zoom" id="zPct">100%</span>
-        <button class="btn" id="zIn" aria-label="Zoomer">+</button>
+      <div class="toolbar" role="toolbar" aria-label="Zoom, affichage et disposition">
+        <div class="tgroup" role="group" aria-label="Zoom">
+          <button class="btn" id="zOut" aria-label="Dézoomer" title="Dézoomer">−</button>
+          <span class="zoom" id="zPct">100%</span>
+          <button class="btn" id="zIn" aria-label="Zoomer" title="Zoomer">+</button>
+        </div>
         <span class="sep"></span>
-        <button class="btn" id="zFit" title="Tout afficher">Ajuster</button>
+        <div class="tgroup" role="group" aria-label="Affichage">
+          <button class="btn" id="btnConcept" aria-pressed="false" data-cmd="Affichage" data-label="Vue conceptuelle" data-sub="Cardinalités, sans attributs ni flux" aria-label="Vue conceptuelle" title="Vue conceptuelle : tables et relations avec cardinalités, sans attributs ni flux">Vue conceptuelle</button>
+          <button class="btn" id="btnDisplayPanel" aria-haspopup="true" aria-expanded="false" data-cmd="Affichage" data-label="Éléments affichés…" aria-label="Éléments affichés" title="Éléments affichés : choisir ce qui est visible">Éléments affichés</button>
+          <button class="btn" id="btnFit" data-cmd="Affichage" data-label="Tout afficher" aria-label="Tout afficher" title="Tout afficher : ajuster le zoom au schéma">Tout afficher</button>
+          <button class="btn" id="btnToggleEditor" aria-pressed="true" data-cmd="Affichage" data-label="Masquer l’éditeur" data-kbd="B" aria-label="Éditeur" title="Masquer l’éditeur (Ctrl/⌘ B)">Éditeur</button>
+        </div>
+        <span class="sep"></span>
+        <div class="tgroup" role="group" aria-label="Disposition">
+          <button class="btn" id="btnLayout" data-cmd="Disposition" data-label="Réorganiser" data-sub="Recalcule la disposition automatique" aria-label="Réorganiser" title="Réorganiser : recalcule la disposition automatique">Réorganiser</button>
+          <button class="btn" id="btnCollapseAll" data-cmd="Disposition" data-label="Tout replier" aria-label="Tout replier" title="Tout replier ou déplier les tables">Tout replier</button>
+          <button class="btn" id="btnLockPanel" aria-haspopup="true" aria-expanded="false" data-cmd="Disposition" data-label="Verrouiller les positions…" aria-label="Verrouiller les positions" title="Verrouiller les positions : choisir les éléments à figer">Verrouiller</button>
+        </div>
       </div>
     </section>
   </main>
@@ -6624,7 +6623,9 @@ function renderAll() {
   renderTraceChip();
   renderGroups(); renderEdges(); renderNodes();
   const all = nodes.length > 0 && nodes.every(n => collapsed.has(n.id));
-  $('btnCollapseAll').textContent = all ? 'Tout déplier' : 'Tout replier';
+  const ca = $('btnCollapseAll');
+  ca.textContent = ca.dataset.label = all ? 'Tout déplier' : 'Tout replier';
+  ca.setAttribute('aria-label', ca.textContent);
 }
 // ---------- Ajustement automatique de la disposition ----------
 // Quand un élément change de hauteur (table, enum ou région repliée / dépliée), ce qui se trouve
@@ -7026,7 +7027,6 @@ document.addEventListener('keydown', e => {
 $('zIn').onclick = () => { const r = svg.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, 1.2); };
 $('zOut').onclick = () => { const r = svg.getBoundingClientRect(); zoomAt(r.width / 2, r.height / 2, 1 / 1.2); };
 $('btnFit').onclick = fit;
-$('zFit').onclick = fit;
 $('btnCollapseAll').onclick = () => {
   if (!nodes.length) return;
   const all = nodes.every(isCollapsed);
@@ -7050,7 +7050,7 @@ function setConceptual(on) {
   syncConceptUI();
 }
 function syncConceptUI() {
-  $('btnConcept').setAttribute('aria-checked', String(conceptual));
+  $('btnConcept').setAttribute('aria-pressed', String(conceptual));
   $('btnCollapseAll').disabled = conceptual;
 }
 $('btnConcept').onclick = () => setConceptual(!conceptual);
@@ -7632,7 +7632,10 @@ const splitEl = document.querySelector('.split');
 function setEditorCollapsed(v) {
   splitEl.classList.toggle('editor-collapsed', v);
   $('btnReopenEditor').hidden = !v;
-  $('btnToggleEditor').firstChild.textContent = v ? 'Afficher l’éditeur' : 'Masquer l’éditeur';
+  const te = $('btnToggleEditor');
+  te.dataset.label = v ? 'Afficher l’éditeur' : 'Masquer l’éditeur';
+  te.title = te.dataset.label + ' (Ctrl/⌘ B)';
+  te.setAttribute('aria-pressed', String(!v));
   store.set(LS_EDCOL, v ? '1' : '');
   requestAnimationFrame(fit);
 }
@@ -7967,7 +7970,8 @@ $('helpClose').onclick = () => { helpModal.hidden = true; };
 helpModal.addEventListener('click', e => { if (e.target === helpModal) helpModal.hidden = true; });
 
 // ---------- Palette de commandes (Ctrl/⌘ K) ----------
-// Les commandes sont lues dans les menus : tout élément .mi visible, avec le nom du menu comme groupe.
+// Les commandes sont lues dans les menus (tout élément .mi visible, avec le nom du menu comme groupe)
+// et dans la barre du canvas (boutons data-cmd : groupes Affichage et Disposition).
 const palette = $('palette'), palInput = $('palInput'), palList = $('palList');
 let palCmds = [], palShown = [], palSel = 0, palPrev = null;
 const fold = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -7984,6 +7988,12 @@ function collectCommands() {
       out.push({ el, group: btn.textContent.trim(), label, sub: sub ? sub.textContent : '', kbd: kbd ? kbd.textContent : '', off: !!el.disabled });
     });
   });
+  // commandes du canvas (Affichage, Disposition) : boutons de la barre du canvas, avant « Exporter »
+  const canvas = [...document.querySelectorAll('.toolbar [data-cmd]')].filter(el => !el.hidden).map(el => ({
+    el, group: el.dataset.cmd, label: el.dataset.label, sub: el.dataset.sub || '',
+    kbd: el.dataset.kbd ? (isMac ? '⌘' : 'Ctrl ') + el.dataset.kbd : '', off: el.disabled }));
+  const at = out.findIndex(c => c.group === 'Exporter');
+  out.splice(at < 0 ? out.length : at, 0, ...canvas);
   return out;
 }
 function palFilter() {

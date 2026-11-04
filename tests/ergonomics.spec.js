@@ -25,7 +25,7 @@ const table = (page, name) => page.locator('#nodesLayer .node.table').filter({ h
 
 test('display panel scrolls on a small viewport and offers « Tout cocher »', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 420 });
-  await menu(page, '#btnView', '#btnDisplayPanel');
+  await page.click('#btnDisplayPanel');
   const panel = page.locator('#displayPanel');
   await expect(panel).toBeVisible();
   await expect(panel.locator('label:has(#showAllEls)')).toHaveText('Tout cocher');
@@ -50,11 +50,11 @@ test('« Masquer » lives in the editor header, hides the editor, and it can be 
   await expect(btn).toBeVisible();
 });
 
-test('menu bar is fully visible and its six menus do not overlap (1280, 1024, 900 px)', async ({ page }) => {
+test('menu bar is fully visible and its four menus do not overlap (1280, 1024, 900 px)', async ({ page }) => {
   for (const width of [1280, 1024, 900]) {
     await page.setViewportSize({ width, height: 720 });
     const boxes = await page.locator('#menubar > .menu-wrap > button').evaluateAll(bs => bs.map(b => { const r = b.getBoundingClientRect(); return { x: r.x, y: r.y, r: r.right, b: r.bottom, t: b.textContent }; }));
-    expect(boxes.map(x => x.t)).toEqual(['Fichier', 'Édition', 'Affichage', 'Disposition', 'Exporter', 'Aide']);
+    expect(boxes.map(x => x.t)).toEqual(['Fichier', 'Édition', 'Exporter', 'Aide']);
     for (const [i, a] of boxes.entries()) {
       expect(a.x, `left edge at ${width}px`).toBeGreaterThanOrEqual(0);
       expect(a.r, `right edge at ${width}px`).toBeLessThanOrEqual(width);
@@ -136,7 +136,7 @@ const exportedStats = (page, svg) => inExported(page, svg, () => ({
 
 test('conceptual view at zoom 30 %: exported entities are enlarged like on the canvas, hidden cardinalities stay hidden', async ({ page }) => {
   await loadExample(page, 'shop');
-  await menu(page, '#btnView', '#btnConcept');
+  await page.click('#btnConcept');
   await expect(page.locator('#world')).toHaveClass(/concept/);
   await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))); // let the deferred fit() run
   await setZoom(page, 0.3);
@@ -181,7 +181,7 @@ test('SVG export has the same nodes and edges as the canvas, also after hiding e
   expect(st.edges).toBe(await page.locator('#edgesLayer .edge').count());
   const before = st.ids.length;
   // hide two tables via the display panel
-  await menu(page, '#btnView', '#btnDisplayPanel');
+  await page.click('#btnDisplayPanel');
   await page.locator('#displayPanel input[data-hide="t:returns"]').uncheck();
   await page.locator('#displayPanel input[data-hide="t:tags"]').uncheck();
   await page.keyboard.press('Escape');
@@ -192,7 +192,7 @@ test('SVG export has the same nodes and edges as the canvas, also after hiding e
   expect(st.ids).not.toContain('t:returns');
   expect(st.edges).toBe(await page.locator('#edgesLayer .edge').count());
   // same in conceptual view
-  await menu(page, '#btnView', '#btnConcept');
+  await page.click('#btnConcept');
   await setZoom(page, 0.4);
   svg = (await exportImage(page, 'svg')).toString('utf8');
   st = await exportedStats(page, svg);
@@ -202,7 +202,7 @@ test('SVG export has the same nodes and edges as the canvas, also after hiding e
 
 test('SVG export keeps the lane bands styled (no default black rectangles)', async ({ page }) => {
   await loadExample(page, 'flow');
-  await menu(page, '#btnView', '#btnDisplayPanel');
+  await page.click('#btnDisplayPanel');
   await page.locator('#displayPanel input[data-lanes]').check();
   await page.keyboard.press('Escape');
   await expect(page.locator('#lanesLayer .lane-band').first()).toBeAttached();
@@ -228,7 +228,7 @@ test('detailed-view PNG export does not depend on the zoom', async ({ page }) =>
 test('colored Ref group edges keep their color in the export (detailed and conceptual views)', async ({ page }) => {
   await loadExample(page, 'shop');
   for (const concept of [false, true]) {
-    if (concept) await menu(page, '#btnView', '#btnConcept');
+    if (concept) await page.click('#btnConcept');
     await setZoom(page, 0.5);
     const canvas = await page.evaluate(() => [...document.querySelectorAll('#edgesLayer .edge.refgrouped')].map(g => ({
       a: g.dataset.a, b: g.dataset.b, line: getComputedStyle(g.querySelector('.line')).stroke, mk: getComputedStyle(g.querySelector('.mk')).stroke

@@ -5,13 +5,13 @@
 - **Deux types de fichier**, choisis à la création : schéma de **cinématique de données** (flux seuls) ou **modèle objets relations** (relations seules) — voir « Types de schéma »
 - Édition avec coloration syntaxique, erreurs localisées à la ligne près
 - Autocomplétion contextuelle : tables et colonnes dans les relations et les mappings, types, paramètres entre crochets, squelettes de blocs, paires automatiques
-- **Une seule barre de menus** (Fichier, Édition, Affichage, Disposition, Exporter, Aide) et une **palette de commandes** (Ctrl/⌘ K) pour tout retrouver au clavier ; la barre du bas ne garde que le zoom
+- **Une barre de menus** (Fichier, Édition, Exporter, Aide), une **barre de boutons sur le canvas** (zoom, affichage, disposition : un seul clic) et une **palette de commandes** (Ctrl/⌘ K) pour tout retrouver au clavier
 - Rechercher / remplacer dans l'éditeur (Ctrl/⌘ F), éditeur repliable (Ctrl/⌘ B) et redimensionnable (largeur mémorisée)
 - Descriptions des champs et des tables (`note` DBML standard) affichées en infobulle au survol
 - Diagramme interactif : déplacement, zoom, layout automatique, repli des tables, verrouillage de position, défilement automatique en glissant vers le bord
 - Navigation au clavier / à la molette : molette = zoom ; **Maj + molette** = défilement horizontal ; **Alt + molette** = défilement vertical ; **flèches** = déplacer la vue (avec Maj, plus vite), quand le focus n'est pas dans l'éditeur ; le geste horizontal d'un pavé tactile défile aussi
 - Cliquer une table, un champ, une valeur d'enum ou une région place le curseur sur la ligne source correspondante
-- Panneau « Éléments affichés » (menu Affichage, en haut à droite du diagramme) classé par type : relations et groupes de relations (modèle) ou flux de données et colonnes (cinématique), régions, tables, énumérations (modèle), chacune individuellement ou par catégorie
+- Panneau « Éléments affichés » (bouton de la barre du canvas, panneau en haut à droite du diagramme) classé par type : relations et groupes de relations (modèle) ou flux de données et colonnes (cinématique), régions, tables, énumérations (modèle), chacune individuellement ou par catégorie
 - Sélection multiple par cadre de souris (Maj+glisser) ou Maj+clic, pour déplacer ou supprimer plusieurs éléments ensemble
 - Suppression d'une sélection (touche Suppr) avec confirmation, en cascade dans le code : relations, flux et appartenances de région concernés sont retirés, les blocs devenus vides aussi
 - Sélecteur de couleur au clic sur une table ou une région, avec palette des couleurs déjà utilisées
@@ -103,18 +103,24 @@ Un fichier est soit un **schéma de cinématique de données**, soit un **modèl
 
 Le point orange à côté du nom du fichier reflète aussi les positions et replis non enregistrés, pas seulement le texte : déplacer une table suffit à le faire apparaître.
 
-Tout passe par la barre de menus en haut ; ouvert, un menu bascule au survol d'un autre, et se navigue aux flèches (Échap ferme).
+Les fichiers, l'édition, les exports et l'aide passent par la barre de menus en haut ; ouvert, un menu bascule au survol d'un autre, et se navigue aux flèches (Échap ferme).
 
 | Menu | Contenu |
 | --- | --- |
 | Fichier | Nouveaux schémas, Ouvrir (Ctrl/⌘ O), Enregistrer (Ctrl/⌘ S), Enregistrer sous (Ctrl/⌘ ⇧ S), Exemples |
 | Édition | Rechercher / remplacer (Ctrl/⌘ F), Copier le DBML, Copier en DBML standard (sans les blocs `Mapping`, pour dbdiagram.io et `@dbml/core`), Supprimer la sélection (Suppr), Changer le type de schéma |
-| Affichage | Vue conceptuelle, Éléments affichés, Tout afficher, Masquer / afficher l'éditeur (Ctrl/⌘ B) |
-| Disposition | Réorganiser, Tout replier / déplier, Verrouiller les positions |
 | Exporter | Image du schéma, Script SQL PostgreSQL |
 | Aide | Palette de commandes (Ctrl/⌘ K), Raccourcis et gestes, lien vers la syntaxe DBML |
 
-**Palette de commandes** (Ctrl/⌘ K, y compris depuis l'éditeur) : liste toutes les commandes des menus, filtrées en tapant (sans tenir compte des accents ni de l'ordre des mots). Flèches pour choisir, Entrée pour exécuter, Échap pour fermer. Une commande indisponible est grisée. Charger un exemple repasse par la confirmation du menu Fichier si le code a été modifié.
+**Barre du canvas** (en bas à droite du diagramme, une seule étape de clic ; elle passe sur plusieurs lignes quand la largeur manque). Chaque bouton a une infobulle en français ; les bascules (Vue conceptuelle, Éditeur) et les panneaux ouverts (Éléments affichés, Verrouiller) sont mis en évidence quand ils sont actifs :
+
+| Groupe | Boutons |
+| --- | --- |
+| Zoom | − / pourcentage / + |
+| Affichage | Vue conceptuelle (bascule, absente pour une cinématique), Éléments affichés (panneau), Tout afficher, Éditeur (masquer / afficher l'éditeur, Ctrl/⌘ B) |
+| Disposition | Réorganiser, Tout replier / Tout déplier, Verrouiller (panneau « Verrouiller les positions ») |
+
+**Palette de commandes** (Ctrl/⌘ K, y compris depuis l'éditeur) : liste toutes les commandes des menus et de la barre du canvas (groupes « Affichage » et « Disposition »), filtrées en tapant (sans tenir compte des accents ni de l'ordre des mots). Flèches pour choisir, Entrée pour exécuter, Échap pour fermer. Une commande indisponible est grisée. Charger un exemple repasse par la confirmation du menu Fichier si le code a été modifié.
 
 - Dans Chrome et Edge, l'API File System Access écrit directement dans le fichier ouvert : Enregistrer met à jour le même fichier, sans nouvelle boîte de dialogue.
 - Dans Firefox et Safari, qui n'ont pas cette API, Enregistrer télécharge une copie `.dbml`.
@@ -153,7 +159,7 @@ Un point à droite du nom signale un champ décrit. Le survol d'un champ affiche
 
 **Clic pour retrouver le code** : cliquer une table, un champ, une valeur d'enum ou une région place le curseur sur la ligne source correspondante dans l'éditeur (comme le double-clic, dès le premier clic).
 
-**Verrouillage** : le menu Disposition > « Verrouiller les positions… » ouvre un panneau classé par type (Régions, Tables, Énumérations), chaque section avec sa case « Toutes », plus une case « Tout verrouiller » en tête pour l'ensemble. Un élément verrouillé (glyphe cadenas) ne peut plus être déplacé, mais reste cliquable pour la sélection et le focus éditeur. Cliquer-glisser sur un élément verrouillé fait défiler la vue (comme sur le fond du canvas) au lieu de ne rien faire. Verrouiller une région verrouille aussi ses membres, repliée ou non.
+**Verrouillage** : le bouton « Verrouiller » de la barre du canvas (ou la commande « Verrouiller les positions… » de la palette) ouvre un panneau classé par type (Régions, Tables, Énumérations), chaque section avec sa case « Toutes », plus une case « Tout verrouiller » en tête pour l'ensemble. Un élément verrouillé (glyphe cadenas) ne peut plus être déplacé, mais reste cliquable pour la sélection et le focus éditeur. Cliquer-glisser sur un élément verrouillé fait défiler la vue (comme sur le fond du canvas) au lieu de ne rien faire. Verrouiller une région verrouille aussi ses membres, repliée ou non.
 
 **Aide et survol** : le menu Aide > « Raccourcis et gestes… » liste les raccourcis clavier et les gestes de la souris. Survoler une table (souris seulement) met ses relations en évidence et atténue le reste, en vue détaillée comme en vue conceptuelle. L'éditeur a un en-tête « Code DBML » avec le bouton « Masquer ».
 
@@ -163,7 +169,7 @@ Un point à droite du nom signale un champ décrit. Le survol d'un champ affiche
 
 **Suppression** : la touche Suppr (ou retour arrière) sur une sélection — une table, un enum, une région repliée, ou plusieurs à la fois — ouvre une confirmation listant ce qui sera retiré, avec le nombre de relations, de lignes de flux et d'appartenances de région impactées. Les éléments verrouillés de la sélection ne sont jamais supprimés (avertissement dans la confirmation, ou message si tout était verrouillé). Supprimer une région repliée supprime aussi ses tables membres. Un `Ref`, `Mapping` ou `TableGroup` qui ne contient plus rien après coup est retiré entièrement. La suppression agit sur le texte source ; elle n'est pas proposée quand le focus clavier est dans l'éditeur ou un champ de saisie, pour ne pas interférer avec l'édition normale du texte.
 
-**Affichage** : le menu Affichage > « Éléments affichés… » ouvre un panneau classé par type :
+**Affichage** : le bouton « Éléments affichés » de la barre du canvas ouvre un panneau classé par type :
 - **Clés étrangères** : la case globale, puis chaque groupe de relations nommé (`Ref nom { }`) avec sa couleur et son nombre
 - **Flux de données** : une case « Toutes », puis une ligne par `Mapping` avec sa couleur et son nombre de correspondances (section absente s'il n'y a aucun `Mapping`)
 - **Régions**, **Tables**, **Énumérations** : chaque élément individuellement, plus une case « Toutes » par catégorie
@@ -195,7 +201,7 @@ Les régions imbriquées sont traitées comme des blocs emboîtés (voir plus ba
 
 ## Vue conceptuelle
 
-Réservée aux **modèles objets relations** (le bouton est absent d'un schéma de cinématique), la « Vue conceptuelle » (menu Affichage) ne montre que les tables, sous forme d'entités avec leur nom, reliées par leurs relations avec cardinalités. Les attributs et les énumérations sont masqués. La même commande rebascule vers la vue détaillée, et le choix est mémorisé.
+Réservée aux **modèles objets relations** (le bouton est absent d'un schéma de cinématique), la « Vue conceptuelle » (bouton de la barre du canvas) ne montre que les tables, sous forme d'entités avec leur nom, reliées par leurs relations avec cardinalités. Les attributs et les énumérations sont masqués. La même commande rebascule vers la vue détaillée, et le choix est mémorisé.
 
 - **Cardinalités** : symboles en pied de corbeau / barres, plus un texte à chaque extrémité. `N` pour le côté « plusieurs » ; côté « un », `1` si la clé étrangère est obligatoire (`not null` ou clé primaire), `0..1` si elle est facultative. `<>` donne `N` des deux côtés. Une relation composite n'est dessinée qu'une fois ; plusieurs relations identiques entre les mêmes tables sont regroupées (la liste figure dans l'infobulle).
 - **Disposition propre** : la vue conceptuelle a ses propres positions (calculées automatiquement au premier affichage, déplaçables ; « Réorganiser » les recalcule). Elles sont enregistrées dans le fichier avec celles de la vue détaillée, sans les modifier. Régions, verrouillage et masquage s'y appliquent comme d'habitude.
@@ -240,7 +246,7 @@ Table stg.contrat [lane: staging] { … }
 Paramètres d'une colonne (tous facultatifs) : `width` (120 à 2000 px ; par défaut la table la plus large + marges), `color` (teinte de la bande), `note` (infobulle).
 
 - **Placement** : une table rattachée à une colonne reste centrée dans celle-ci. Au glisser, seule sa hauteur (Y) change, y compris dans un groupe ou une sélection multiple. « Réorganiser » place chaque table dans sa colonne (voir ci-dessous). Les tables sans `lane` restent libres au glisser ; à la réorganisation, elles rejoignent la colonne de leurs voisines reliées, ou une colonne implicite à droite si elles n'en ont pas.
-- **Affichage** : les bandes sont invisibles par défaut. Affichage > Colonnes > « Afficher les colonnes » les fait apparaître avec leur titre en tête (le choix est mémorisé).
+- **Affichage** : les bandes sont invisibles par défaut. Éléments affichés > Colonnes > « Afficher les colonnes » les fait apparaître avec leur titre en tête (le choix est mémorisé).
 - **Autocomplétion** : snippet `Lanes`, paramètre `lane:` et noms des colonnes déclarées.
 - **DBML standard** : « Copier en DBML standard » retire le bloc `Lanes` et les paramètres `lane:` (les autres paramètres de la table sont conservés). Un `lane:` qui ne correspond à aucune colonne déclarée est une erreur de syntaxe.
 
