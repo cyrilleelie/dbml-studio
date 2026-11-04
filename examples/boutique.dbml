@@ -1,0 +1,136 @@
+// Modifie le code : le diagramme se met à jour tout seul.
+// Survole un champ pour voir sa description ([note: '…']).
+// Cet exemple montre tous les types de relations DBML :
+//   >  plusieurs-à-un     <  un-à-plusieurs
+//   -  un-à-un           <> plusieurs-à-plusieurs
+// Un bloc « Ref nom [color: …] { … } » regroupe des relations et se filtre
+// dans le panneau Affichage (voir liens_commandes).
+// [domain: out] marque les objets extérieurs au domaine modélisé, mais reliés à lui (vue conceptuelle).
+Project boutique {
+  database_type: 'PostgreSQL'
+  Note: 'Mini e-commerce de démonstration'
+}
+
+Enum order_status {
+  pending [note: 'En attente de paiement']
+  paid
+  shipped
+  delivered
+  cancelled
+}
+
+Enum return_reason {
+  damaged
+  wrong_item
+  changed_mind
+}
+
+// ---------- Comptes ----------
+Table users as U [domain: out] {
+  id integer [pk, increment]
+  email varchar(255) [not null, unique, note: 'Identifiant de connexion, normalisé en minuscules']
+  full_name varchar(120)
+  created_at timestamp [default: `now()`, note: 'Date de création du compte (UTC)']
+  Note: 'Comptes clients'
+}
+
+// Un-à-un : chaque utilisateur a au plus un profil
+Table user_profiles [domain: out] {
+  user_id integer [pk, ref: - U.id]
+  avatar_url text
+  birth_date date
+  newsletter boolean [default: false, note: 'Consentement explicite à la newsletter (RGPD)']
+}
+
+// Relation déclarée directement sur la colonne (inline)
+Table addresses [domain: out] {
+  id integer [pk, increment]
+  user_id integer [not null, ref: > U.id]
+  city varchar(80)
+  zip varchar(10)
+}
+
+// ---------- Catalogue ----------
+// Auto-référence : une catégorie peut avoir une catégorie parente
+Table categories {
+  id integer [pk, increment]
+  parent_id integer
+  name varchar(80) [not null]
+}
+
+Table products [headercolor: #2f7d5b] {
+  id integer [pk, increment]
+  category_id integer [not null]
+  sku varchar(32) [unique, note: 'Référence article interne, stable dans le temps']
+  name varchar(200) [not null]
+  price decimal(10,2) [not null, default: 0, note: 'Prix public TTC en euros']
+}
+
+Table tags {
+  id integer [pk, increment]
+  label varchar(40) [unique]
+}
+
+// ---------- Commandes ----------
+Table orders {
+  id integer [pk, increment]
+  user_id integer [not null]
+  status order_status [default: 'pending']
+  shipping_address_id integer [note: 'Adresse de livraison figée au moment de la commande']
+  created_at timestamp [default: `now()`]
+}
+
+Table order_items {
+  order_id integer
+  product_id integer
+  quantity integer [not null, default: 1]
+  unit_price decimal(10,2) [not null, note: '''
+    Prix unitaire au moment de l'achat.
+    Copié depuis products.price pour conserver l'historique.
+  ''']
+  indexes {
+    (order_id, product_id) [pk]
+  }
+}
+
+// Relation composite : un retour pointe vers une ligne de commande
+Table returns {
+  id integer [pk, increment]
+  order_id integer [not null]
+  product_id integer [not null]
+  reason return_reason [not null]
+  requested_at timestamp [default: `now()`]
+}
+
+// ---------- Relations ----------
+Ref: categories.parent_id > categories.id [delete: set null]
+Ref: categories.id < products.category_id
+Ref: products.id <> tags.id
+
+Ref liens_commandes [color: #b5651d] {
+  orders.user_id > users.id
+  orders.shipping_address_id > addresses.id
+  order_items.order_id > orders.id [delete: cascade]
+  order_items.product_id > products.id [update: cascade]
+}
+
+Ref: returns.(order_id, product_id) > order_items.(order_id, product_id) [delete: cascade]
+
+// ---------- Régions ----------
+TableGroup comptes [color: #3b6ea8] {
+  users
+  user_profiles
+  addresses
+}
+
+TableGroup catalogue [color: #2f7d5b] {
+  categories
+  products
+  tags
+}
+
+TableGroup commandes [color: #b5651d] {
+  orders
+  order_items
+  returns
+}

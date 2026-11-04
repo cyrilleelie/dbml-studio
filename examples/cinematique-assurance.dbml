@@ -1,0 +1,176 @@
+// Cinématique de données : du système source jusqu'à l'indicateur.
+// Clique sur une colonne pour suivre son lignage (amont et aval).
+// Survole un champ pour lire sa description (dictionnaire de données).
+//
+// Les blocs Mapping sont une extension de DBML Studio :
+//   source > cible [transform: '…']        colonne vers colonne
+//   table.(a, b) > table.c                  plusieurs colonnes vers une
+//   table.* > table.*                       flux au niveau de la table
+//
+// Lanes déclare des colonnes verticales (affichables via Affichage > Colonnes) ; chaque table choisit
+// la sienne avec [lane: nom]. Une table de colonne reste alignée sur celle-ci quand on la déplace.
+Lanes {
+  sources [color: #667a8b]
+  staging [color: #3b6ea8]
+  entrepot [color: #7a4fb5, note: "Entrepôt de données"]
+  restitution [color: #b5651d]
+}
+
+Enum statut_sinistre {
+  ouvert
+  en_cours
+  clos
+}
+
+// ---------- Sources ----------
+Table src_contrats.contrat [lane: sources] {
+  num_contrat varchar(20) [pk, note: 'Numéro de contrat attribué par le système de gestion']
+  code_produit varchar(10) [note: 'Code produit du catalogue (AUTO, HAB, SANTE…)']
+  date_effet date [note: "Date de prise d'effet des garanties"]
+  prime_annuelle decimal(12,2) [note: 'Prime annuelle TTC, en euros']
+  id_souscripteur integer [note: 'Personne qui a signé le contrat']
+}
+
+Table src_contrats.personne [lane: sources] {
+  id integer [pk]
+  nom varchar(80)
+  prenom varchar(80)
+  date_naissance date [note: 'Donnée personnelle : non restituée en clair après le staging']
+  code_postal varchar(5) [note: "Code postal de l'adresse principale"]
+}
+
+Table src_sinistres.declaration [lane: sources] {
+  ref_sinistre varchar(20) [pk]
+  num_contrat varchar(20)
+  date_survenance date [note: 'Date de l’événement, distincte de la date de déclaration']
+  montant_estime decimal(12,2) [note: 'Provision estimée par le gestionnaire, révisable']
+  montant_regle decimal(12,2) [note: 'Cumul des règlements effectués']
+  statut varchar(10) [note: '''
+    Codes source : O (ouvert), E (en cours), C (clos).
+    Transcodés vers l'enum statut_sinistre dans l'entrepôt.
+  ''']
+}
+
+Ref: src_contrats.contrat.id_souscripteur > src_contrats.personne.id
+
+// ---------- Staging (copie brute + date de chargement) ----------
+Table stg.contrat [lane: staging] {
+  num_contrat varchar(20)
+  code_produit varchar(10)
+  date_effet date
+  prime_annuelle decimal(12,2)
+  id_souscripteur integer
+  date_chargement timestamp [note: 'Horodatage technique du lot de chargement']
+}
+
+Table stg.personne [lane: staging] {
+  id integer
+  nom varchar(80)
+  prenom varchar(80)
+  date_naissance date
+  code_postal varchar(5)
+  date_chargement timestamp
+}
+
+Table stg.sinistre [lane: staging] {
+  ref_sinistre varchar(20)
+  num_contrat varchar(20)
+  date_survenance date
+  montant_estime decimal(12,2)
+  montant_regle decimal(12,2)
+  statut varchar(10)
+  date_chargement timestamp
+}
+
+// ---------- Entrepôt ----------
+Table dwh.dim_assure [lane: entrepot] {
+  id_assure integer [pk, increment]
+  id_source integer [not null, unique, note: 'Identifiant de la personne dans le système source']
+  nom_complet varchar(170) [note: 'Prénom et nom, nom en majuscules']
+  tranche_age varchar(10) [note: "Tranche de 10 ans (ex. 30-39), remplace la date de naissance pour limiter l'exposition des données personnelles"]
+  departement char(2) [note: 'Département déduit du code postal']
+}
+
+Table dwh.dim_contrat [lane: entrepot] {
+  id_contrat integer [pk, increment, note: 'Clé technique de l’entrepôt']
+  num_contrat varchar(20) [unique]
+  produit varchar(10)
+  id_assure integer [not null]
+  prime_annuelle decimal(12,2)
+}
+
+Table dwh.fait_sinistre [lane: entrepot] {
+  id_sinistre integer [pk, increment]
+  ref_sinistre varchar(20) [unique]
+  id_contrat integer [not null]
+  date_survenance date
+  charge_sinistre decimal(12,2) [note: 'Montant réglé si le sinistre est clos, sinon montant estimé']
+  statut statut_sinistre
+}
+
+Ref: dwh.dim_contrat.id_assure > dwh.dim_assure.id_assure
+Ref: dwh.fait_sinistre.id_contrat > dwh.dim_contrat.id_contrat
+
+// ---------- Restitution ----------
+Table mart.indicateur_sp [lane: restitution] {
+  Note: 'Indicateur de rentabilité technique, publié chaque mois'
+  produit varchar(10) [pk]
+  annee integer [pk]
+  primes decimal(14,2) [note: 'Somme des primes annuelles du produit']
+  charge decimal(14,2) [note: 'Somme des charges des sinistres survenus dans l’année']
+  ratio_sp decimal(6,4) [note: 'Ratio sinistres / primes. Au-delà de 1, le produit est déficitaire.']
+}
+
+// ---------- Flux ----------
+Mapping chargement_staging [color: #3b6ea8, note: 'Extraction quotidienne, sans transformation'] {
+  src_contrats.contrat.* > stg.contrat.*
+  src_contrats.personne.* > stg.personne.*
+  src_sinistres.declaration.* > stg.sinistre.*
+}
+
+Mapping alimentation_dwh [color: #7a4fb5, note: "Chargement de l'entrepôt"] {
+  stg.personne.id > dwh.dim_assure.id_source
+  stg.personne.(prenom, nom) > dwh.dim_assure.nom_complet [transform: 'prenom || " " || upper(nom)']
+  stg.personne.date_naissance > dwh.dim_assure.tranche_age [transform: 'tranche de 10 ans à la date du jour']
+  stg.personne.code_postal > dwh.dim_assure.departement [transform: 'left(code_postal, 2)']
+  stg.contrat.num_contrat > dwh.dim_contrat.num_contrat
+  stg.contrat.code_produit > dwh.dim_contrat.produit
+  stg.contrat.prime_annuelle > dwh.dim_contrat.prime_annuelle
+  stg.contrat.id_souscripteur > dwh.dim_contrat.id_assure [transform: 'recherche dans dim_assure par id_source']
+  stg.sinistre.ref_sinistre > dwh.fait_sinistre.ref_sinistre
+  stg.sinistre.num_contrat > dwh.fait_sinistre.id_contrat [transform: 'recherche dans dim_contrat par num_contrat']
+  stg.sinistre.date_survenance > dwh.fait_sinistre.date_survenance
+  stg.sinistre.(montant_regle, montant_estime, statut) > dwh.fait_sinistre.charge_sinistre [transform: 'montant réglé si clos, sinon estimé']
+  stg.sinistre.statut > dwh.fait_sinistre.statut [transform: 'codes source → statut_sinistre']
+}
+
+Mapping calcul_indicateurs [color: #b5651d, note: 'Agrégation annuelle par produit'] {
+  dwh.dim_contrat.produit > mart.indicateur_sp.produit
+  dwh.fait_sinistre.date_survenance > mart.indicateur_sp.annee [transform: 'extract(year)']
+  dwh.dim_contrat.prime_annuelle > mart.indicateur_sp.primes [transform: 'sum par produit et année']
+  dwh.fait_sinistre.charge_sinistre > mart.indicateur_sp.charge [transform: 'sum par produit et année']
+  mart.indicateur_sp.(charge, primes) > mart.indicateur_sp.ratio_sp [transform: 'charge / primes']
+}
+
+// ---------- Couches ----------
+TableGroup sources [color: #667a8b] {
+  src_contrats.contrat
+  src_contrats.personne
+  src_sinistres.declaration
+}
+
+TableGroup staging [color: #3b6ea8] {
+  stg.contrat
+  stg.personne
+  stg.sinistre
+}
+
+TableGroup entrepot [color: #7a4fb5] {
+  dwh.dim_assure
+  dwh.dim_contrat
+  dwh.fait_sinistre
+}
+
+TableGroup restitution [color: #b5651d] {
+  mart.indicateur_sp
+}
