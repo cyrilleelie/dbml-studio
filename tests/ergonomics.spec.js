@@ -213,3 +213,21 @@ test('detailed-view PNG export does not depend on the zoom', async ({ page }) =>
   expect(b).toEqual(a);
   expect(a.w).toBeGreaterThan(500);
 });
+
+test('colored Ref group edges keep their color in the export (detailed and conceptual views)', async ({ page }) => {
+  await loadExample(page, 'shop');
+  for (const concept of [false, true]) {
+    if (concept) await page.click('#btnConcept');
+    await setZoom(page, 0.5);
+    const canvas = await page.evaluate(() => [...document.querySelectorAll('#edgesLayer .edge.refgrouped')].map(g => ({
+      a: g.dataset.a, b: g.dataset.b, line: getComputedStyle(g.querySelector('.line')).stroke, mk: getComputedStyle(g.querySelector('.mk')).stroke
+    })));
+    expect(canvas.length).toBeGreaterThan(0);
+    expect(canvas[0].line).not.toBe(await page.evaluate(() => getComputedStyle(document.querySelector('#edgesLayer .edge:not(.refgrouped) .line')).stroke));
+    const svg = (await exportImage(page, 'svg')).toString('utf8');
+    const exp = await inExported(page, svg, () => [...document.querySelectorAll('.edge.refgrouped')].map(g => ({
+      a: g.dataset.a, b: g.dataset.b, line: getComputedStyle(g.querySelector('.line')).stroke, mk: getComputedStyle(g.querySelector('.mk')).stroke
+    })));
+    expect(exp).toEqual(canvas);
+  }
+});

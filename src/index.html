@@ -3135,6 +3135,12 @@ function buildExportSVG({ theme, background }) {
     }
     // poignées et boutons d'interaction : invisibles ou sans objet hors du canvas
     clone.querySelectorAll('.chev-hit,.gchev-hit,.hit,.chev,.swatch,title').forEach(el => el.remove());
+    // relations d'un groupe coloré : trait et symboles prennent la couleur --fc, comme sur le canvas
+    clone.querySelectorAll('.edge.refgrouped').forEach(g => {
+      const c = g.style.getPropertyValue('--fc').trim();
+      g.querySelectorAll('.line,.mk').forEach(el => { el.style.stroke = c; });
+      g.style.removeProperty('--fc');
+    });
     clone.querySelectorAll('.edge.flow').forEach(g => {
       const c = g.style.getPropertyValue('--fc').trim();
       // style en ligne : prioritaire sur les règles génériques .edge .line
