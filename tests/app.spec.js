@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { menu } = require('./helpers');
 
 const SHOP_TABLES = ['users', 'user_profiles', 'addresses', 'categories', 'products', 'tags', 'orders', 'order_items', 'returns'];
 const FLOW_TABLES = ['src_contrats.contrat', 'src_contrats.personne', 'src_sinistres.declaration', 'stg.contrat', 'stg.personne', 'stg.sinistre',
@@ -19,8 +20,7 @@ test.beforeEach(async ({ page, baseURL }) => {
 test.afterEach(() => { expect(external, 'no network request expected').toEqual([]); expect(errors).toEqual([]); });
 
 async function loadExample(page, key) {
-  await page.click('#btnExamples');
-  await page.click(`button.mi[data-ex="${key}"]`);
+  await menu(page, '#btnFile', `button.mi[data-ex="${key}"]`);
   // a confirmation appears only if the editor content was modified
   if (await page.locator('#exOk').isVisible()) await page.click('#exOk');
   await expect(page.locator('#status')).toHaveClass(/ok/);
@@ -72,8 +72,7 @@ test('invalid DBML reports a localized error', async ({ page }) => {
 
 test('SQL export contains tables and enum type', async ({ page }) => {
   await loadExample(page, 'shop');
-  await page.click('#btnExport');
-  await page.click('#btnSql');
+  await menu(page, '#btnExport', '#btnSql');
   const sql = page.locator('#sqlOut');
   await expect(sql).toBeVisible();
   const text = await sql.inputValue();
@@ -83,8 +82,7 @@ test('SQL export contains tables and enum type', async ({ page }) => {
 
 test('SVG export downloads an SVG with table names', async ({ page }) => {
   await loadExample(page, 'shop');
-  await page.click('#btnExport');
-  await page.click('#btnImage');
+  await menu(page, '#btnExport', '#btnImage');
   await page.locator('#imgForm label:has(input[name="fmt"][value="svg"])').click();
   const [download] = await Promise.all([page.waitForEvent('download'), page.click('#imgGo')]);
   expect(download.suggestedFilename()).toMatch(/\.svg$/);

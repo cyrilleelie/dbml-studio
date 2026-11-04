@@ -5,12 +5,13 @@
 - **Deux types de fichier**, choisis à la création : schéma de **cinématique de données** (flux seuls) ou **modèle objets relations** (relations seules) — voir « Types de schéma »
 - Édition avec coloration syntaxique, erreurs localisées à la ligne près
 - Autocomplétion contextuelle : tables et colonnes dans les relations et les mappings, types, paramètres entre crochets, squelettes de blocs, paires automatiques
-- Rechercher / remplacer dans l'éditeur (Ctrl/⌘ F), éditeur repliable pour libérer la place du diagramme
+- **Une seule barre de menus** (Fichier, Édition, Affichage, Disposition, Exporter, Aide) et une **palette de commandes** (Ctrl/⌘ K) pour tout retrouver au clavier ; la barre du bas ne garde que le zoom
+- Rechercher / remplacer dans l'éditeur (Ctrl/⌘ F), éditeur repliable (Ctrl/⌘ B) et redimensionnable (largeur mémorisée)
 - Descriptions des champs et des tables (`note` DBML standard) affichées en infobulle au survol
 - Diagramme interactif : déplacement, zoom, layout automatique, repli des tables, verrouillage de position, défilement automatique en glissant vers le bord
 - Navigation au clavier / à la molette : molette = zoom ; **Maj + molette** = défilement horizontal ; **Alt + molette** = défilement vertical ; **flèches** = déplacer la vue (avec Maj, plus vite), quand le focus n'est pas dans l'éditeur ; le geste horizontal d'un pavé tactile défile aussi
 - Cliquer une table, un champ, une valeur d'enum ou une région place le curseur sur la ligne source correspondante
-- Panneau « Affichage » (bas à droite) classé par type : relations et groupes de relations (modèle) ou flux de données et colonnes (cinématique), régions, tables, énumérations (modèle), chacune individuellement ou par catégorie
+- Panneau « Éléments affichés » (menu Affichage, en haut à droite du diagramme) classé par type : relations et groupes de relations (modèle) ou flux de données et colonnes (cinématique), régions, tables, énumérations (modèle), chacune individuellement ou par catégorie
 - Sélection multiple par cadre de souris (Maj+glisser) ou Maj+clic, pour déplacer ou supprimer plusieurs éléments ensemble
 - Suppression d'une sélection (touche Suppr) avec confirmation, en cascade dans le code : relations, flux et appartenances de région concernés sont retirés, les blocs devenus vides aussi
 - Sélecteur de couleur au clic sur une table ou une région, avec palette des couleurs déjà utilisées
@@ -42,7 +43,7 @@ npm test        # tests du parser
 | `src/autocomplete.js` | Moteur d'autocomplétion : analyse du contexte au curseur et suggestions. Sans dépendance au DOM, testé sous Node |
 | `src/parser.js` | Tokenizer, parser DBML et validation. Sans dépendance, utilisable dans le navigateur et sous Node |
 | `src/index.html` | Interface : CSS, rendu SVG, interactions, export SQL. Contient les marqueurs d'injection |
-| `examples/*.dbml` | Exemples du menu « Exemples » (déclarés dans `build.mjs` et dans le menu de `index.html`) |
+| `examples/*.dbml` | Exemples du menu Fichier (déclarés dans `build.mjs` et dans le menu de `index.html`) |
 | `vendor/dagre.min.js` | dagre 0.8.5 (licence MIT, voir `vendor/dagre.LICENSE`), injecté pour le fonctionnement hors ligne |
 | `build.mjs` | Injecte dagre, le parser et les exemples dans le gabarit HTML |
 
@@ -102,7 +103,18 @@ Un fichier est soit un **schéma de cinématique de données**, soit un **modèl
 
 Le point orange à côté du nom du fichier reflète aussi les positions et replis non enregistrés, pas seulement le texte : déplacer une table suffit à le faire apparaître.
 
-**Fichier ▾** : Ouvrir (Ctrl/⌘ O), Enregistrer (Ctrl/⌘ S), Enregistrer sous (Ctrl/⌘ ⇧ S), Rechercher/remplacer (Ctrl/⌘ F), Copier le DBML, Copier en DBML standard (sans les blocs `Mapping`, pour dbdiagram.io et `@dbml/core`).
+Tout passe par la barre de menus en haut ; ouvert, un menu bascule au survol d'un autre, et se navigue aux flèches (Échap ferme).
+
+| Menu | Contenu |
+| --- | --- |
+| Fichier | Nouveaux schémas, Ouvrir (Ctrl/⌘ O), Enregistrer (Ctrl/⌘ S), Enregistrer sous (Ctrl/⌘ ⇧ S), Exemples |
+| Édition | Rechercher / remplacer (Ctrl/⌘ F), Copier le DBML, Copier en DBML standard (sans les blocs `Mapping`, pour dbdiagram.io et `@dbml/core`), Supprimer la sélection (Suppr), Changer le type de schéma |
+| Affichage | Vue conceptuelle, Éléments affichés, Tout afficher, Masquer / afficher l'éditeur (Ctrl/⌘ B) |
+| Disposition | Réorganiser, Tout replier / déplier, Verrouiller les positions |
+| Exporter | Image du schéma, Script SQL PostgreSQL |
+| Aide | Palette de commandes (Ctrl/⌘ K), Raccourcis et gestes, lien vers la syntaxe DBML |
+
+**Palette de commandes** (Ctrl/⌘ K, y compris depuis l'éditeur) : liste toutes les commandes des menus, filtrées en tapant (sans tenir compte des accents ni de l'ordre des mots). Flèches pour choisir, Entrée pour exécuter, Échap pour fermer. Une commande indisponible est grisée. Charger un exemple repasse par la confirmation du menu Fichier si le code a été modifié.
 
 - Dans Chrome et Edge, l'API File System Access écrit directement dans le fichier ouvert : Enregistrer met à jour le même fichier, sans nouvelle boîte de dialogue.
 - Dans Firefox et Safari, qui n'ont pas cette API, Enregistrer télécharge une copie `.dbml`.
@@ -135,13 +147,15 @@ Un point à droite du nom signale un champ décrit. Le survol d'un champ affiche
 
 **Repli de l'éditeur** : le bouton « Masquer » en haut de l'éditeur le fait disparaître au profit du diagramme, ou le raccourci Ctrl/⌘ B (fonctionne depuis n'importe où, éditeur ou canvas) ; un onglet vertical sur le bord gauche le rouvre. L'état est mémorisé.
 
+**Largeur de l'éditeur** : glisser le séparateur, ou le focaliser et utiliser ← / → (pas de 24 px) ; double-clic pour revenir à la largeur par défaut. La largeur est mémorisée, et le diagramme garde au moins 240 px.
+
 ## Diagramme : navigation et manipulation
 
 **Clic pour retrouver le code** : cliquer une table, un champ, une valeur d'enum ou une région place le curseur sur la ligne source correspondante dans l'éditeur (comme le double-clic, dès le premier clic).
 
-**Verrouillage** : le bouton « Verrouiller » de la barre d'outils ouvre un panneau classé par type (Régions, Tables, Énumérations), chaque section avec sa case « Toutes », plus une case « Tout verrouiller » en tête pour l'ensemble. Un élément verrouillé (glyphe cadenas) ne peut plus être déplacé, mais reste cliquable pour la sélection et le focus éditeur. Cliquer-glisser sur un élément verrouillé fait défiler la vue (comme sur le fond du canvas) au lieu de ne rien faire. Verrouiller une région verrouille aussi ses membres, repliée ou non.
+**Verrouillage** : le menu Disposition > « Verrouiller les positions… » ouvre un panneau classé par type (Régions, Tables, Énumérations), chaque section avec sa case « Toutes », plus une case « Tout verrouiller » en tête pour l'ensemble. Un élément verrouillé (glyphe cadenas) ne peut plus être déplacé, mais reste cliquable pour la sélection et le focus éditeur. Cliquer-glisser sur un élément verrouillé fait défiler la vue (comme sur le fond du canvas) au lieu de ne rien faire. Verrouiller une région verrouille aussi ses membres, repliée ou non.
 
-**Aide et survol** : le bouton « ? » en haut à gauche du canvas ouvre un rappel des gestes (il se ferme d'un clic ailleurs). Survoler une table (souris seulement) met ses relations en évidence et atténue le reste, en vue détaillée comme en vue conceptuelle. L'éditeur a un en-tête « Code DBML » avec le bouton « Masquer ».
+**Aide et survol** : le menu Aide > « Raccourcis et gestes… » liste les raccourcis clavier et les gestes de la souris. Survoler une table (souris seulement) met ses relations en évidence et atténue le reste, en vue détaillée comme en vue conceptuelle. L'éditeur a un en-tête « Code DBML » avec le bouton « Masquer ».
 
 **Défilement automatique** : glisser une table ou une région près du bord du canvas fait défiler la vue pour suivre le déplacement, sans à-coup au relâchement.
 
@@ -149,7 +163,7 @@ Un point à droite du nom signale un champ décrit. Le survol d'un champ affiche
 
 **Suppression** : la touche Suppr (ou retour arrière) sur une sélection — une table, un enum, une région repliée, ou plusieurs à la fois — ouvre une confirmation listant ce qui sera retiré, avec le nombre de relations, de lignes de flux et d'appartenances de région impactées. Les éléments verrouillés de la sélection ne sont jamais supprimés (avertissement dans la confirmation, ou message si tout était verrouillé). Supprimer une région repliée supprime aussi ses tables membres. Un `Ref`, `Mapping` ou `TableGroup` qui ne contient plus rien après coup est retiré entièrement. La suppression agit sur le texte source ; elle n'est pas proposée quand le focus clavier est dans l'éditeur ou un champ de saisie, pour ne pas interférer avec l'édition normale du texte.
 
-**Affichage** : le bouton « Affichage » (bas à droite, à côté de « Verrouiller ») ouvre un panneau classé par type :
+**Affichage** : le menu Affichage > « Éléments affichés… » ouvre un panneau classé par type :
 - **Clés étrangères** : la case globale, puis chaque groupe de relations nommé (`Ref nom { }`) avec sa couleur et son nombre
 - **Flux de données** : une case « Toutes », puis une ligne par `Mapping` avec sa couleur et son nombre de correspondances (section absente s'il n'y a aucun `Mapping`)
 - **Régions**, **Tables**, **Énumérations** : chaque élément individuellement, plus une case « Toutes » par catégorie
@@ -169,7 +183,7 @@ En remontant, un bloc ne vient jamais recouvrir un élément resté en place. Re
 
 ### Réorganiser (disposition automatique)
 
-Le bouton « Réorganiser » recalcule toutes les positions, dans la vue détaillée comme dans la vue conceptuelle :
+Disposition > « Réorganiser » recalcule toutes les positions, dans la vue détaillée comme dans la vue conceptuelle :
 
 1. **Colonnes** : celles des `Lanes` si elles existent ; sinon des rangs déduits du sens des relations et des flux (les sources à gauche).
 2. **Blocs sans chevauchement** : une région est un bloc rectangulaire (ses tables y sont empilées par colonne) ; une table hors région est un bloc seule. Deux blocs qui se recouvrent horizontalement ne se recouvrent jamais verticalement. Une région repliée se pose en haut à gauche de son bloc déplié, donc la disposition reste sans chevauchement qu'elle soit repliée ou dépliée.
@@ -181,7 +195,7 @@ Les régions imbriquées sont traitées comme des blocs emboîtés (voir plus ba
 
 ## Vue conceptuelle
 
-Réservée aux **modèles objets relations** (le bouton est absent d'un schéma de cinématique), la « Vue conceptuelle » (barre du bas) ne montre que les tables, sous forme d'entités avec leur nom, reliées par leurs relations avec cardinalités. Les attributs et les énumérations sont masqués. Le bouton rebascule vers la vue détaillée, et le choix est mémorisé.
+Réservée aux **modèles objets relations** (le bouton est absent d'un schéma de cinématique), la « Vue conceptuelle » (menu Affichage) ne montre que les tables, sous forme d'entités avec leur nom, reliées par leurs relations avec cardinalités. Les attributs et les énumérations sont masqués. La même commande rebascule vers la vue détaillée, et le choix est mémorisé.
 
 - **Cardinalités** : symboles en pied de corbeau / barres, plus un texte à chaque extrémité. `N` pour le côté « plusieurs » ; côté « un », `1` si la clé étrangère est obligatoire (`not null` ou clé primaire), `0..1` si elle est facultative. `<>` donne `N` des deux côtés. Une relation composite n'est dessinée qu'une fois ; plusieurs relations identiques entre les mêmes tables sont regroupées (la liste figure dans l'infobulle).
 - **Disposition propre** : la vue conceptuelle a ses propres positions (calculées automatiquement au premier affichage, déplaçables ; « Réorganiser » les recalcule). Elles sont enregistrées dans le fichier avec celles de la vue détaillée, sans les modifier. Régions, verrouillage et masquage s'y appliquent comme d'habitude.
@@ -206,7 +220,7 @@ Mapping alimentation_dwh [color: #7a4fb5, note: 'Chargement de l’entrepôt'] {
 - `t.* > u.*` : flux au niveau table ; le lignage suit les colonnes de même nom
 - Paramètres de flux : `transform`, `note`. Paramètres de bloc : `color`, `note`
 
-Ces blocs ne sont pas reconnus par dbdiagram.io ni `@dbml/core`. Le menu Fichier ▾ « Copier en DBML standard » les retire.
+Ces blocs ne sont pas reconnus par dbdiagram.io ni `@dbml/core`. Le menu Édition > « Copier en DBML standard » les retire.
 
 ## Colonnes verticales : `Lanes` (extension DBML Studio)
 
