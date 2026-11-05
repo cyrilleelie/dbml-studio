@@ -143,7 +143,7 @@ function parseDBML(src) {
     return t.v;
   };
 
-  const db = { tables: [], refs: [], enums: [], groups: [], mappings: [], refGroups: [], lanes: [], lanesBlocks: [], hasDomain: false };
+  const db = { tables: [], refs: [], enums: [], groups: [], mappings: [], refGroups: [], lanes: [], lanesBlocks: [], hasDomain: false, project: null };
   const partials = new Map(); // TablePartial nommés, injectés par « ~nom » dans les tables
   let currentRefGroup = null;
 
@@ -232,7 +232,7 @@ function parseDBML(src) {
       const isPartial = kw === 'tablepartial';
       const refsBefore = db.refs.length;
       const parts = dotted();
-      const tbl = { name: parts.join('.'), alias: null, cols: [], note: null, color: null, lane: null, laneIndex: -1, domain: null, line: t.line, injects: [] };
+      const tbl = { name: parts.join('.'), alias: null, cols: [], note: null, color: null, lane: null, laneIndex: -1, domain: null, line: t.line, injects: [], indexes: [] };
       if (isKw(peek(), 'as')) { next(); tbl.alias = name(); }
       if (isSym(peek(), '[')) {
         const list = settings(), range = lastRange;
@@ -265,11 +265,18 @@ function parseDBML(src) {
             if (peek().t === 'eof') throw dbmlErr('indexes : accolade } manquante', io.line);
             const ln = peek().line; const names = [];
             while (peek().line === ln && !isSym(peek(), '[') && !isSym(peek(), '}') && peek().t !== 'eof') {
-              const x = next(); if (x.t === 'id' || x.t === 'qid') names.push(x.v);
+              const x = next(); if (x.t === 'id' || x.t === 'qid') names.push(x.v); else if (x.t === 'expr') names.push('`' + x.v + '`');
             }
+            const idx = { cols: names.slice(), name: null, type: null, unique: false, pk: false, note: null };
+            tbl.indexes.push(idx);
             if (isSym(peek(), '[') && peek().line === ln) {
               const st = settings();
               for (const s of st) {
+                if (s.key === 'name') idx.name = valStr(s.val || []);
+                else if (s.key === 'type') idx.type = valStr(s.val || []);
+                else if (s.key === 'note') idx.note = valStr(s.val || []);
+                else if (s.key === 'unique') idx.unique = true;
+                else if (s.key === 'pk') idx.pk = true;
                 if (s.key === 'pk') names.forEach(nm => { const col = tbl.cols.find(c2 => c2.name === nm); if (col) col.pk = true; });
                 if (s.key === 'unique' && names.length === 1) { const col = tbl.cols.find(c2 => c2.name === names[0]); if (col) col.unique = true; }
               }
@@ -417,8 +424,17 @@ function parseDBML(src) {
 
     else if (kw === 'project' || kw === 'records') {
       next();
-      while (!isSym(peek(), '{')) { if (peek().t === 'eof') throw dbmlErr(`${t.v} : bloc { attendu`, t.line); next(); }
-      skipBlock();
+      let pname = null;
+      while (!isSym(peek(), '{')) { if (peek().t === 'eof') throw dbmlErr(`${t.v} : bloc { attendu`, t.line); const x = next(); if (kw === 'project' && pname === null && (x.t === 'id' || x.t === 'qid')) pname = x.v; }
+      if (kw !== 'project') { skipBlock(); continue; }
+      const po = expect('{'); const pr = { name: pname, note: null }; let d = 1;
+      while (d > 0) {
+        if (peek().t === 'eof') throw dbmlErr('Bloc { non fermé', po.line);
+        if (d === 1 && isKw(peek(), 'note') && (isSym(peek(1), ':') || isSym(peek(1), '{'))) { next(); pr.note = noteValue(); continue; }
+        const x = next();
+        if (isSym(x, '{')) d++; else if (isSym(x, '}')) d--;
+      }
+      db.project = pr;
     }
 
     else if (kw === 'note') {

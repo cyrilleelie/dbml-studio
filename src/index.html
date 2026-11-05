@@ -387,6 +387,7 @@ button{font:inherit;color:inherit}
         <div class="menu" id="exportMenu" role="menu" aria-label="Exporter" hidden>
           <button class="mi" role="menuitem" id="btnImage">Image du schéma…<small>PNG, JPG, WebP ou SVG</small></button>
           <button class="mi" role="menuitem" id="btnSql">Script SQL PostgreSQL…<small>Tables, types, clés étrangères, commentaires</small></button>
+          <button class="mi" role="menuitem" id="btnDict">Dictionnaire de données…<small>HTML autonome ou Markdown</small></button>
         </div>
       </div>
       <div class="menu-wrap">
@@ -509,6 +510,22 @@ button{font:inherit;color:inherit}
   </div>
 </div>
 
+<div class="modal" id="dictModal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dictTitle">
+    <header style="flex-wrap:wrap">
+      <h2 id="dictTitle">Dictionnaire de données</h2>
+      <div class="seg" role="radiogroup" aria-label="Format">
+        <label><input type="radio" name="dfmt" value="html" checked><span>HTML autonome</span></label>
+        <label><input type="radio" name="dfmt" value="md"><span>Markdown</span></label>
+      </div>
+      <button class="btn" id="dictCopy">Copier</button>
+      <button class="btn" id="dictSave">Télécharger</button>
+      <button class="btn" id="dictClose">Fermer</button>
+    </header>
+    <textarea id="dictOut" readonly spellcheck="false"></textarea>
+  </div>
+</div>
+
 <div class="modal" id="typeModal" hidden>
   <div class="sheet small" role="dialog" aria-modal="true" aria-labelledby="typeTitle">
     <header><h2 id="typeTitle"></h2></header>
@@ -573,6 +590,9 @@ button{font:inherit;color:inherit}
 </script>
 <script>
 /*__AUTOCOMPLETE__*/
+</script>
+<script>
+/*__DICTIONARY__*/
 </script>
 <script>
 (() => {
@@ -3191,11 +3211,35 @@ $('btnSql').onclick = () => {
 };
 $('sqlClose').onclick = () => { $('modal').hidden = true; };
 $('modal').addEventListener('click', e => { if (e.target === $('modal')) $('modal').hidden = true; });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('modal').hidden = true; imgModal.hidden = true; helpModal.hidden = true; closeMenu(); if (trace) { trace = null; renderAll(); } clearMultiSel(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('modal').hidden = true; imgModal.hidden = true; dictModal.hidden = true; helpModal.hidden = true; closeMenu(); if (trace) { trace = null; renderAll(); } clearMultiSel(); } });
 $('sqlCopy').onclick = () => copyText($('sqlOut').value, $('sqlCopy'), 'SQL copié dans le presse-papier');
 $('sqlSave').onclick = async () => {
   const name = baseName() + (inViewer ? '.sql.txt' : '.sql');
   const r = await offerDownload(name, new Blob([$('sqlOut').value], { type: 'text/plain;charset=utf-8' }));
+  if (r === 'saved') toast(`${name} téléchargé`);
+};
+
+// ---------- Export dictionnaire de données ----------
+const dictModal = $('dictModal');
+const dictFormat = () => (dictModal.querySelector('input[name="dfmt"]:checked') || {}).value || 'html';
+function refreshDict() {
+  const opts = { format: dictFormat(), title: fileName ? baseName() : '', date: Date.now() };
+  $('dictOut').value = buildDictionary(db, opts);
+}
+$('btnDict').onclick = () => {
+  closeMenus();
+  if (!db) return;
+  refreshDict();
+  dictModal.hidden = false; $('dictClose').focus();
+};
+dictModal.querySelectorAll('input[name="dfmt"]').forEach(r => r.addEventListener('change', refreshDict));
+$('dictClose').onclick = () => { dictModal.hidden = true; };
+dictModal.addEventListener('click', e => { if (e.target === dictModal) dictModal.hidden = true; });
+$('dictCopy').onclick = () => copyText($('dictOut').value, $('dictCopy'), 'Dictionnaire copié dans le presse-papier');
+$('dictSave').onclick = async () => {
+  const md = dictFormat() === 'md';
+  const name = baseName() + (md ? '.md' : '.html') + (inViewer ? '.txt' : '');
+  const r = await offerDownload(name, new Blob([$('dictOut').value], { type: md ? 'text/markdown;charset=utf-8' : 'text/html;charset=utf-8' }));
   if (r === 'saved') toast(`${name} téléchargé`);
 };
 

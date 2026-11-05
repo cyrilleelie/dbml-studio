@@ -20,6 +20,7 @@
 - Cinématique de données via les blocs `Mapping` (extension), avec suivi du lignage colonne par colonne
 - Enregistrement du fichier en cours (Ctrl/⌘ S), positions et replis conservés dans le fichier lui-même, et export du schéma en image (PNG, JPG, WebP, SVG)
 - Export SQL PostgreSQL (copie ou téléchargement) et export en DBML standard
+- Export d'un dictionnaire de données (HTML autonome imprimable ou Markdown) : tables, champs, index, énumérations, relations, régions, flux
 
 ## Utiliser la version en ligne
 
@@ -53,6 +54,7 @@ Ne jamais éditer `index.html` à la main : il est généré par `build.mjs` à 
 | Fichier | Rôle |
 |---|---|
 | `src/autocomplete.js` | Moteur d'autocomplétion : analyse du contexte au curseur et suggestions. Sans dépendance au DOM, testé sous Node |
+| `src/dictionary.js` | Génération du dictionnaire de données (HTML autonome ou Markdown) à partir du schéma analysé. Sans dépendance au DOM, testé sous Node |
 | `src/parser.js` | Tokenizer, parser DBML et validation. Sans dépendance, utilisable dans le navigateur et sous Node |
 | `index.html` | Livrable généré par `build.mjs` (fichier autonome, versionné, servi par GitHub Pages) ; ne pas l'éditer |
 | `src/index.html` | Gabarit : interface, CSS, rendu SVG, interactions, export SQL. Contient les marqueurs d'injection |
@@ -122,7 +124,7 @@ Les fichiers, l'édition, les exports et l'aide passent par la barre de menus en
 | --- | --- |
 | Fichier | Nouveaux schémas, Ouvrir (Ctrl/⌘ O), Enregistrer (Ctrl/⌘ S), Enregistrer sous (Ctrl/⌘ ⇧ S), Exemples |
 | Édition | Rechercher / remplacer (Ctrl/⌘ F), Copier le DBML, Copier en DBML standard (sans les blocs `Mapping`, pour dbdiagram.io et `@dbml/core`), Supprimer la sélection (Suppr), Changer le type de schéma |
-| Exporter | Image du schéma, Script SQL PostgreSQL |
+| Exporter | Image du schéma, Script SQL PostgreSQL, Dictionnaire de données |
 | Aide | Raccourcis et gestes, lien vers la syntaxe DBML |
 
 **Barre du canvas** (en bas à droite du diagramme, une seule étape de clic ; elle passe sur plusieurs lignes quand la largeur manque). Chaque bouton a une infobulle en français ; les bascules (Vue conceptuelle, Éditeur) et les panneaux ouverts (Éléments affichés, Verrouiller) sont mis en évidence quand ils sont actifs :
@@ -140,6 +142,8 @@ Les fichiers, l'édition, les exports et l'aide passent par la barre de menus en
 **Exporter ▾ › Image du schéma** : PNG, JPG, WebP (résolution 1×, 2× ou 3×, plafonnée à 12 000 px de côté) ou SVG vectoriel ; thème clair ou sombre ; fond coloré ou transparent (sauf JPG). L'image contient tout le diagramme tel que le canvas l'affiche au zoom courant (tables et régions repliées, éléments masqués, bandes de colonnes, et en vue conceptuelle entités agrandies et cardinalités masquées comprises), sans la sélection, le survol ni les boutons d'interface.
 
 Les images raster utilisent les polices du système : un navigateur ne charge pas les polices web à l'intérieur d'une image SVG convertie. Le SVG garde la déclaration IBM Plex, appliquée si la police est installée.
+
+**Exporter ▾ › Dictionnaire de données** : une boîte de dialogue propose le format, **HTML autonome** (un seul fichier, CSS intégré, polices système, aucune ressource externe, lisible à l'écran et à l'impression) ou **Markdown** (tableaux GFM), avec un aperçu du texte, puis Copier ou Télécharger (`.html` / `.md`). Le document, en français, contient : le titre (nom du `Project`, sinon du fichier, sinon « Dictionnaire de données »), la date de génération, la note du `Project`, un sommaire des tables à liens d'ancre, puis pour chaque table (dans l'ordre du source) son nom complet, son alias, sa note, sa région et le tableau de ses champs (type, contraintes : PK, NOT NULL, UNIQUE, INCREMENT, DEFAULT, référence vers `table.colonne` ; description), ses index, les énumérations, les relations (source → cible, cardinalité, groupe `Ref`, `delete` / `update`), les régions et leurs tables, et, s'il y a des `Mapping`, les flux de données (source, cible, transformation). Le dictionnaire documente le modèle, pas la vue : les éléments masqués dans le canvas y figurent, et le commentaire `dbml-studio:layout` n'y apparaît jamais. Les textes sont échappés (HTML) ou mis en forme pour tenir dans une cellule (Markdown : `|` protégé, retours à la ligne en `<br>`).
 
 ## Descriptions
 

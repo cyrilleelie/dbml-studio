@@ -19,6 +19,7 @@ const inject = (marker, content) => {
 inject('/*__DAGRE__*/', read('vendor/dagre.min.js'));
 inject('/*__PARSER__*/', read('src/parser.js'));
 inject('/*__AUTOCOMPLETE__*/', read('src/autocomplete.js'));
+inject('/*__DICTIONARY__*/', read('src/dictionary.js'));
 inject('/*__SAMPLES__*/', JSON.stringify(samples).replace(/<\//g, '<\\/'));
 
 writeFileSync(new URL('index.html', import.meta.url), html);
