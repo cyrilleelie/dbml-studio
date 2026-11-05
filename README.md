@@ -31,6 +31,16 @@ Adresse : <https://cyrilleelie.github.io/dbml-studio/>
 - Le code et la disposition sont sauvegardés dans le `localStorage` de ce site. La version en ligne et le fichier ouvert en local ont chacun leur propre sauvegarde : pour passer de l'un à l'autre, Enregistrer le fichier `.dbml` puis l'ouvrir dans l'autre.
 - L'origine `cyrilleelie.github.io` est partagée par tous les sites Pages du compte : leurs `localStorage` sont accessibles entre eux.
 
+## Installer l'application
+
+Depuis la version en ligne (<https://cyrilleelie.github.io/dbml-studio/>) :
+
+- **Chrome / Edge (ordinateur)** : cliquer sur l'icône d'installation dans la barre d'adresse.
+- **Android (Chrome)** : menu > Ajouter à l'écran d'accueil (ou Installer l'application).
+- **iOS (Safari)** : Partager > Sur l'écran d'accueil.
+
+Après la première visite, l'application fonctionne hors ligne. Les mises à jour arrivent au prochain chargement en ligne (la nouvelle version est utilisée dès le chargement suivant). Le fichier `index.html` local reste utilisable tel quel, sans installation.
+
 ## Utiliser
 
 Ouvrir `index.html` (le fichier à la racine du dépôt) dans un navigateur récent (Chrome, Edge, Firefox, Safari 16.4+).
@@ -44,12 +54,13 @@ Le code et la disposition du diagramme sont sauvegardés dans le `localStorage` 
 Prérequis : Node 18+ (aucune dépendance npm).
 
 ```
-npm run build      # régénère index.html (à versionner)
+npm run build      # régénère index.html, manifest.webmanifest et sw.js (à versionner)
+npm run icons      # régénère les icônes PNG depuis assets/icon.svg (Chromium de Playwright)
 npm run test:unit  # tests Node du parser et de l'autocomplétion
 npm test           # tests Playwright (e2e)
 ```
 
-Ne jamais éditer `index.html` à la main : il est généré par `build.mjs` à partir de `src/`. La CI vérifie qu'il est à jour.
+Ne jamais éditer `index.html`, `manifest.webmanifest` ni `sw.js` à la main : ils sont générés par `build.mjs` à partir de `src/`. La CI vérifie qu'ils sont à jour.
 
 | Fichier | Rôle |
 |---|---|
@@ -57,6 +68,9 @@ Ne jamais éditer `index.html` à la main : il est généré par `build.mjs` à 
 | `src/dictionary.js` | Génération du dictionnaire de données (HTML autonome ou Markdown) à partir du schéma analysé. Sans dépendance au DOM, testé sous Node |
 | `src/parser.js` | Tokenizer, parser DBML et validation. Sans dépendance, utilisable dans le navigateur et sous Node |
 | `index.html` | Livrable généré par `build.mjs` (fichier autonome, versionné, servi par GitHub Pages) ; ne pas l'éditer |
+| `manifest.webmanifest` | Manifeste PWA généré par `build.mjs` (nom, couleurs, icônes) ; ne pas l'éditer |
+| `sw.js` | Service worker généré par `build.mjs` (cache nommé d'après le hash d'`index.html`, hors ligne) ; ne pas l'éditer |
+| `scripts/icons.mjs` | Rend `assets/icon.svg` en `icon-192.png`, `icon-512.png` et `icon-maskable-512.png` (versionnés) |
 | `src/index.html` | Gabarit : interface, CSS, rendu SVG, interactions, export SQL. Contient les marqueurs d'injection |
 | `examples/*.dbml` | Exemples du menu Fichier (déclarés dans `build.mjs` et dans le menu de `src/index.html`) |
 | `vendor/dagre.min.js` | dagre 0.8.5 (licence MIT, voir `vendor/dagre.LICENSE`), injecté pour le fonctionnement hors ligne |
@@ -308,7 +322,7 @@ TableGroup commandes [color: #b5651d] {
 
 ## Icône et raccourci
 
-Le dossier `assets/` contient l'icône (`icon.svg`, `icon.png`, `icon.ico`). Elle est aussi intégrée comme favicon : l'onglet du navigateur l'affiche.
+Le dossier `assets/` contient l'icône (`icon.svg`, `icon.png`, `icon.ico`, et les PNG de l'application installable `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`). Elle est aussi intégrée comme favicon : l'onglet du navigateur l'affiche.
 
 - **Windows** : `assets/creer-raccourci-windows.ps1` crée un raccourci sur le Bureau avec l'icône. À la main : clic droit sur le fichier HTML > Créer un raccourci > Propriétés > Changer d'icône > `icon.ico`.
 - **Linux** : `assets/creer-raccourci-linux.sh` crée un lanceur dans le menu des applications.

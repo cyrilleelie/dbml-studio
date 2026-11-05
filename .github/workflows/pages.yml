@@ -19,14 +19,14 @@ jobs:
         with:
           node-version: 22
       - run: npm run build
-      - name: Vérifier que index.html est à jour
+      - name: Vérifier que les fichiers générés sont à jour
         run: |
-          git diff --exit-code index.html || { echo "::error::index.html n'est pas à jour : lancer « npm run build » puis versionner index.html."; exit 1; }
+          git diff --exit-code index.html manifest.webmanifest sw.js || { echo "::error::index.html, manifest.webmanifest ou sw.js n'est pas à jour : lancer « npm run build » puis versionner les fichiers générés."; exit 1; }
       - name: Préparer le site
         run: |
           mkdir -p _site/assets
-          cp index.html _site/
-          cp assets/icon.svg assets/icon.png _site/assets/
+          cp index.html manifest.webmanifest sw.js _site/
+          cp assets/icon.svg assets/icon.png assets/icon-192.png assets/icon-512.png assets/icon-maskable-512.png _site/assets/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
